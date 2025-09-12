@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
+import GTMTracker from './components/GTMTracker';
 import Inicio from './pages/Inicio';
 import Servicios from './pages/Servicios';
 import Cotizador from './pages/Cotizador';
@@ -92,6 +93,7 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
+      <GTMTracker />
       <PreviewWrapper>
         <div className="min-h-screen flex flex-col">
           <Header />

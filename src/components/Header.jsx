@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
+import { trackCTAClick } from '../lib/gtm';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -36,6 +37,7 @@ export default function Header() {
                       ? 'text-primary after:w-full'
                       : 'text-gray-700 hover:text-primary'
                   } after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:bg-primary after:w-0 after:transition-all after:duration-200 focus-visible:text-primary focus-visible:after:w-full`}
+                  onClick={() => trackCTAClick(item.name, 'header_menu', 'header_navigation', item.href)}
                 >
                   {item.name}
                 </Link>
@@ -43,6 +45,7 @@ export default function Header() {
               <Link
                 to="/contacto"
                 className="ml-4 bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:bg-primary/90 hover:scale-105 active:scale-95 hover:shadow-lg"
+                onClick={() => trackCTAClick('Hablar con asesor', 'header_cta', 'header_navigation', '/contacto')}
               >
                 Hablar con asesor
               </Link>
@@ -78,7 +81,10 @@ export default function Header() {
                       ? 'text-primary after:w-full'
                       : 'text-gray-700 hover:text-primary'
                   } after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:bg-primary after:w-0 after:transition-all after:duration-200 focus-visible:text-primary focus-visible:after:w-full`}
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={() => {
+                    trackCTAClick(item.name, 'mobile_menu', 'mobile_navigation', item.href);
+                    setMobileMenuOpen(false);
+                  }}
                 >
                   {item.name}
                 </Link>
@@ -86,7 +92,10 @@ export default function Header() {
               <Link
                 to="/contacto"
                 className="block bg-primary text-white px-4 py-2 rounded-lg text-base font-semibold transition-all duration-200 hover:bg-primary/90 hover:scale-105 active:scale-95 hover:shadow-lg mt-4"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => {
+                  trackCTAClick('Hablar con asesor', 'mobile_cta', 'mobile_navigation', '/contacto');
+                  setMobileMenuOpen(false);
+                }}
               >
                 Hablar con asesor
               </Link>

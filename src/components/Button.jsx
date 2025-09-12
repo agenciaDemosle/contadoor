@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { trackButtonClick, trackCTAClick, trackExternalLink } from '../lib/gtm';
 
 export default function Button({ 
   to, 
@@ -8,7 +9,10 @@ export default function Button({
   variant = 'primary',
   className = '',
   type = 'button',
-  disabled = false 
+  disabled = false,
+  trackingName = null,
+  trackingSection = 'unknown',
+  trackingPosition = null
 }) {
   const baseClasses = 'inline-block px-6 py-3 rounded-button font-semibold transition-all duration-240';
   
@@ -20,9 +24,31 @@ export default function Button({
 
   const classes = `${baseClasses} ${variants[variant]} ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`;
 
+  // Función para manejar el tracking
+  const handleTracking = () => {
+    if (disabled) return;
+    
+    const buttonText = typeof children === 'string' ? children : trackingName || 'Button';
+    
+    if (to) {
+      // Link interno
+      trackCTAClick(buttonText, trackingPosition || 'internal', trackingSection, to);
+    } else if (href) {
+      // Link externo  
+      trackExternalLink(href, buttonText, trackingSection);
+    } else {
+      // Botón regular
+      trackButtonClick(buttonText, trackingSection, { variant });
+    }
+  };
+
   if (to) {
     return (
-      <Link to={to} className={classes}>
+      <Link 
+        to={to} 
+        className={classes}
+        onClick={handleTracking}
+      >
         {children}
       </Link>
     );
@@ -30,7 +56,13 @@ export default function Button({
 
   if (href) {
     return (
-      <a href={href} className={classes} target="_blank" rel="noopener noreferrer">
+      <a 
+        href={href} 
+        className={classes} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        onClick={handleTracking}
+      >
         {children}
       </a>
     );
@@ -39,7 +71,10 @@ export default function Button({
   return (
     <button 
       type={type}
-      onClick={onClick} 
+      onClick={(e) => {
+        handleTracking();
+        if (onClick) onClick(e);
+      }}
       className={classes}
       disabled={disabled}
     >

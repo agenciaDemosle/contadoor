@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { trackQuoteEvent, trackConversion } from '../../lib/gtm';
 // Paso inicial
 import StepInicial from './steps/StepInicial';
 // Flujo empresa existente
@@ -25,6 +26,30 @@ export default function CotizadorWizard() {
     formalizacion: {},
     contacto: {}
   });
+  
+  // Track inicio del cotizador
+  useEffect(() => {
+    trackQuoteEvent('start', 0, {
+      timestamp: new Date().toISOString()
+    });
+    
+    // Track abandono cuando se sale de la página
+    const handleBeforeUnload = () => {
+      if (currentStep > 0 && currentStep < steps.length - 1) {
+        trackQuoteEvent('abandon', currentStep, {
+          abandoned_at_step: steps[currentStep]?.id,
+          flow_type: flujo,
+          completion_percentage: Math.round((currentStep / (steps.length - 1)) * 100)
+        });
+      }
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [currentStep, flujo, steps]);
 
   // Definir los pasos según el flujo seleccionado
   const getSteps = () => {
@@ -61,11 +86,19 @@ export default function CotizadorWizard() {
   const updateFormData = (stepId, data) => {
     // Manejar el paso inicial especialmente
     if (stepId === 'inicial' && data.hasCompany !== undefined) {
-      setFlujo(data.hasCompany ? 'empresa-existente' : 'formalizacion');
+      const selectedFlow = data.hasCompany ? 'empresa-existente' : 'formalizacion';
+      setFlujo(selectedFlow);
       setFormData(prev => ({
         ...prev,
         inicial: data
       }));
+      
+      // Track la selección de flujo
+      trackQuoteEvent('flow_selected', 1, {
+        flow_type: selectedFlow,
+        has_company: data.hasCompany
+      });
+      
       // Avanzar automáticamente al siguiente paso después de establecer el flujo
       setCurrentStep(1);
     } else {
@@ -89,7 +122,32 @@ export default function CotizadorWizard() {
 
   const nextStep = () => {
     if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
+      const nextStepIndex = currentStep + 1;
+      const currentStepData = steps[currentStep];
+      
+      // Track progreso del paso
+      trackQuoteEvent('step_complete', nextStepIndex, {
+        step_id: currentStepData.id,
+        step_title: currentStepData.title,
+        flow_type: flujo
+      });
+      
+      setCurrentStep(nextStepIndex);
+      
+      // Track si llegó al resultado final
+      if (nextStepIndex === steps.length - 1) {
+        trackQuoteEvent('complete', steps.length, {
+          flow_type: flujo,
+          total_steps: steps.length
+        });
+        
+        // Track conversión
+        trackConversion('quote_complete', null, {
+          flow_type: flujo,
+          completion_time: new Date().toISOString()
+        });
+      }
+      
       // Hacer scroll suave al top del wizard
       if (wizardRef.current) {
         const yOffset = -100; // Offset para el header sticky

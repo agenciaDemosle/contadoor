@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Container from '../components/Container';
 import Section from '../components/Section';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import { trackFormStart, trackFormSubmit, trackConversion, trackExternalLink } from '../lib/gtm';
 
 export default function Contacto() {
   const [formData, setFormData] = useState({
@@ -12,14 +13,34 @@ export default function Contacto() {
     empresa: '',
     mensaje: ''
   });
+  const [hasStartedForm, setHasStartedForm] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Tracking del submit
+    trackFormSubmit('contact_form', 'contact', {
+      has_company: !!formData.empresa,
+      message_length: formData.mensaje.length
+    });
+    
+    // Tracking de conversión
+    trackConversion('contact_form', null, {
+      contact_method: 'web_form',
+      source_page: 'contact'
+    });
+    
     console.log('Formulario enviado:', formData);
     alert('Gracias por contactarnos. Te responderemos pronto.');
   };
 
   const handleChange = (field, value) => {
+    // Trackear inicio del formulario en la primera interacción
+    if (!hasStartedForm) {
+      trackFormStart('contact_form', 'contact');
+      setHasStartedForm(true);
+    }
+    
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -88,7 +109,13 @@ export default function Contacto() {
                     className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none"
                   />
                 </div>
-                <Button type="submit" className="w-full shadow-brutal hover:shadow-none transform hover:translate-x-2 hover:translate-y-2 transition-all font-bold">
+                <Button 
+                  type="submit" 
+                  className="w-full shadow-brutal hover:shadow-none transform hover:translate-x-2 hover:translate-y-2 transition-all font-bold"
+                  trackingName="Solicitar contacto ahora"
+                  trackingSection="contact_form"
+                  trackingPosition="form_submit"
+                >
                   Solicitar contacto ahora
                 </Button>
               </form>
@@ -104,7 +131,11 @@ export default function Contacto() {
                   </div>
                   <div className="flex items-start">
                     <span className="font-medium mr-2">WhatsApp:</span>
-                    <a href="https://wa.me/56979881891" className="text-green-600 hover:text-green-700 underline">
+                    <a 
+                      href="https://wa.me/56979881891" 
+                      className="text-green-600 hover:text-green-700 underline"
+                      onClick={() => trackExternalLink('https://wa.me/56979881891', 'WhatsApp +569 79881891', 'contact_info')}
+                    >
                       +569 79881891
                     </a>
                   </div>
@@ -124,8 +155,9 @@ export default function Contacto() {
                   href="https://outlook.office.com/book/Contadoor@contadoor.cl/s/328-yS0DYEm9h2tm4lDIHQ2" 
                   variant="outline"
                   className="w-full"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  trackingName="Agendar una reunión"
+                  trackingSection="contact_scheduling"
+                  trackingPosition="contact_card"
                 >
                   Agendar una reunión
                 </Button>
