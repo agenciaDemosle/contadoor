@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import './styles/preview.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply antialiased;
+  }
+}
+
+@layer components {
+  .shadow-brutal {
+    box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.2);
+  }
+  
+  .shadow-brutal:hover {
+    box-shadow: none;
+  }
+}

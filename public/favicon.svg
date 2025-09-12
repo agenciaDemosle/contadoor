@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Fondo morado con bordes redondeados -->
+  <rect width="64" height="64" rx="12" fill="#7C3AED"/>
+  
+  <!-- Calculadora - Cuerpo principal -->
+  <rect x="16" y="12" width="32" height="40" rx="3" fill="white" opacity="0.95"/>
+  
+  <!-- Pantalla de la calculadora -->
+  <rect x="20" y="16" width="24" height="8" rx="1" fill="#7C3AED" opacity="0.3"/>
+  
+  <!-- Líneas de la pantalla -->
+  <rect x="22" y="18" width="12" height="1" fill="#7C3AED" opacity="0.6"/>
+  <rect x="22" y="21" width="8" height="1" fill="#7C3AED" opacity="0.6"/>
+  
+  <!-- Botones de la calculadora - Primera fila -->
+  <rect x="20" y="28" width="5" height="4" rx="0.5" fill="#7C3AED" opacity="0.7"/>
+  <rect x="27" y="28" width="5" height="4" rx="0.5" fill="#7C3AED" opacity="0.7"/>
+  <rect x="34" y="28" width="5" height="4" rx="0.5" fill="#7C3AED" opacity="0.7"/>
+  <rect x="41" y="28" width="3" height="4" rx="0.5" fill="#7C3AED" opacity="0.9"/>
+  
+  <!-- Botones de la calculadora - Segunda fila -->
+  <rect x="20" y="34" width="5" height="4" rx="0.5" fill="#7C3AED" opacity="0.7"/>
+  <rect x="27" y="34" width="5" height="4" rx="0.5" fill="#7C3AED" opacity="0.7"/>
+  <rect x="34" y="34" width="5" height="4" rx="0.5" fill="#7C3AED" opacity="0.7"/>
+  <rect x="41" y="34" width="3" height="4" rx="0.5" fill="#7C3AED" opacity="0.9"/>
+  
+  <!-- Botones de la calculadora - Tercera fila -->
+  <rect x="20" y="40" width="5" height="4" rx="0.5" fill="#7C3AED" opacity="0.7"/>
+  <rect x="27" y="40" width="5" height="4" rx="0.5" fill="#7C3AED" opacity="0.7"/>
+  <rect x="34" y="40" width="5" height="4" rx="0.5" fill="#7C3AED" opacity="0.7"/>
+  <rect x="41" y="40" width="3" height="4" rx="0.5" fill="#7C3AED" opacity="0.9"/>
+  
+  <!-- Botones de la calculadora - Cuarta fila -->
+  <rect x="20" y="46" width="12" height="4" rx="0.5" fill="#7C3AED" opacity="0.7"/>
+  <rect x="34" y="46" width="5" height="4" rx="0.5" fill="#7C3AED" opacity="0.7"/>
+  <rect x="41" y="46" width="3" height="4" rx="0.5" fill="#7C3AED" opacity="0.9"/>
+</svg>
