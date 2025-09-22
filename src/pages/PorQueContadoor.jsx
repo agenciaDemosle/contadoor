@@ -1,8 +1,15 @@
 import { motion } from 'framer-motion';
 import Container from '../components/Container';
 import Button from '../components/Button';
+import { trackPageView } from '../lib/gtm';
+import { useEffect } from 'react';
 
 export default function PorQueContadoor() {
+  // Track page load
+  useEffect(() => {
+    trackPageView('Por Que Contadoor', '/por-que-contadoor');
+  }, []);
+
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }

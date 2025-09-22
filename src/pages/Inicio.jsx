@@ -1,10 +1,172 @@
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { Link } from 'react-router-dom';
+import { MessageCircle, SearchCheck, CalendarCheck, Handshake, BarChart3, ShieldCheck, Ban, Headphones, Eye, Clock, Users, Bell, FileText, Rocket, Smile, CalendarDays, Star, ChevronDown, ChevronUp, Quote } from 'lucide-react';
 import Container from '../components/Container';
 import Section from '../components/Section';
 import Button from '../components/Button';
 import Card from '../components/Card';
 
+// Componente contador animado para beneficios
+function AnimatedBenefit({ end, duration = 2000, suffix = '', prefix = '', text }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+
+  useEffect(() => {
+    if (!isInView) return;
+
+    let startTime;
+    let animationFrame;
+
+    const animate = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+      const currentCount = Math.floor(easeOutQuart * end);
+
+      setCount(currentCount);
+
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(animate);
+      } else {
+        setCount(end);
+      }
+    };
+
+    animationFrame = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+    };
+  }, [end, duration, isInView]);
+
+  if (text) {
+    return <span ref={ref}>{text}</span>;
+  }
+
+  return (
+    <span ref={ref}>
+      {prefix}{count}{suffix}
+    </span>
+  );
+}
+
+// Componente FAQ Item
+function FAQItem({ question, answer, isOpen, onToggle }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+      className="border border-gray-200 rounded-xl bg-white shadow-sm hover:shadow-md transition-all duration-300"
+    >
+      <button
+        onClick={onToggle}
+        className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-50 transition-colors rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+        aria-expanded={isOpen}
+      >
+        <span className="font-semibold text-gray-900 text-lg pr-4">{question}</span>
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
+        </motion.div>
+      </button>
+      <motion.div
+        initial={false}
+        animate={{
+          height: isOpen ? "auto" : 0,
+          opacity: isOpen ? 1 : 0
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="overflow-hidden"
+      >
+        <div className="px-6 pb-5">
+          <p className="text-gray-700 leading-relaxed">{answer}</p>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// Lazy section component para optimizar carga
+function LazySection({ children, fallback = null }) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '100px' }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref}>
+      {isVisible ? children : fallback || <div className="h-96 bg-gray-100 animate-pulse rounded-lg" />}
+    </div>
+  );
+}
+
 export default function Inicio() {
+  const [openFAQ, setOpenFAQ] = useState(null);
+
+  const toggleFAQ = (index) => {
+    setOpenFAQ(openFAQ === index ? null : index);
+  };
+
+  const faqData = [
+    {
+      question: "¿Cuánto tiempo toma el traspaso desde mi contador actual?",
+      answer: "El traspaso completo toma entre 24-48 horas. Nuestro equipo se encarga de todo: solicitar la información a tu contador anterior, revisar el estado de tus obligaciones y ponerte al día si hay atrasos. Tú solo necesitas firmar un poder simple y nosotros nos encargamos del resto."
+    },
+    {
+      question: "¿Qué pasa si tengo multas o atrasos pendientes?",
+      answer: "Primero hacemos un diagnóstico gratuito para identificar todos los problemas. Luego te damos un plan claro para regularizar todo. En muchos casos podemos rebajar o eliminar multas mediante condonaciones del SII. No te cobramos extra por ponerte al día."
+    },
+    {
+      question: "¿Realmente responden en 15 minutos por WhatsApp?",
+      answer: "Sí, nuestro tiempo promedio de respuesta en horario hábil es de 8-15 minutos. Cada cliente tiene el WhatsApp directo de su asesor asignado. Para consultas urgentes fuera de horario, tenemos un sistema de respuesta en menos de 2 horas."
+    },
+    {
+      question: "¿Qué incluye exactamente el servicio mensual?",
+      answer: "Incluye: contabilidad completa, declaraciones mensuales (IVA, renta), emisión de honorarios, certificados de renta, remuneraciones y previsión, finiquitos, informe mensual ejecutivo claro, y tu asesor directo por WhatsApp. Todo en un precio fijo sin sorpresas."
+    },
+    {
+      question: "¿Trabajan con todos los tipos de empresa?",
+      answer: "Sí, trabajamos con: empresas individuales, sociedades, SPA, SRL, fundaciones, cooperativas y personas naturales con y sin giro. Desde emprendedores que recién empiezan hasta empresas con facturación de varios millones al mes."
+    },
+    {
+      question: "¿Qué pasa si no estoy conforme con el servicio?",
+      answer: "Ofrecemos garantía de satisfacción. Si en los primeros 60 días no estás conforme, te devolvemos el 100% de lo pagado y te ayudamos a traspasar toda tu información al contador que elijas, sin costo adicional."
+    },
+    {
+      question: "¿Cómo sé que mi información está segura?",
+      answer: "Usamos sistemas de seguridad bancaria para proteger tu información. Todos nuestros profesionales tienen reserva profesional. Además, hacemos respaldos diarios en la nube y nunca compartimos información con terceros sin tu autorización expresa."
+    },
+    {
+      question: "¿Puedo cambiar de plan si mi empresa crece?",
+      answer: "Por supuesto. Nuestros planes son flexibles y crecen contigo. Si tu facturación aumenta, simplemente ajustamos el plan. Si decrece, también podemos hacer el ajuste. Siempre con transparencia total en los costos."
+    }
+  ];
+
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
@@ -15,147 +177,714 @@ export default function Inicio() {
     visible: { opacity: 1, x: 0 }
   };
 
+  const slideUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
+
+  const bounceIn = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { type: "spring", damping: 20, stiffness: 300 }
+    }
+  };
+
   return (
     <>
       {/* Hero sólido morado con texto blanco */}
-      <section className="relative min-h-[700px] flex items-center overflow-hidden bg-primary-600 text-white">
-        <Container className="relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <motion.div 
+      <section className="relative min-h-[700px] flex items-center overflow-hidden bg-primary-600 text-white py-16 lg:py-24">
+        {/* Overlay suave en mobile para contraste */}
+        <div className="absolute inset-0 bg-black/10 md:bg-transparent" />
+        <Container className="relative z-10 px-6 md:px-4">
+          <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-16 items-center">
+            <motion.div
               initial="hidden"
               animate="visible"
               variants={slideIn}
               transition={{ duration: 0.6 }}
+              className="text-center md:text-left"
             >
-              <div className="inline-block mb-6">
-                <span className="bg-white text-primary-600 px-4 py-2 rounded-full text-sm font-semibold">
+              <motion.div
+                variants={bounceIn}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: 0.1 }}
+                className="inline-block mb-6"
+              >
+                <a
+                  href="#reseñas"
+                  className="bg-white text-primary-600 px-4 py-2 rounded-full text-sm font-semibold hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer block group relative"
+                  data-gtm="hero_badge_trust"
+                  title="Empresas de todas las industrias en Chile confían en nosotros"
+                >
+                  <motion.span
+                    animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                    className="inline-block mr-2 text-yellow-400"
+                  >
+                    ⭐
+                  </motion.span>
                   +500 empresas confían en nosotros
-                </span>
-              </div>
-              <h1 className="text-5xl md:text-7xl font-black mb-6 leading-tight">
-  Delega sin perder el control, <span className="text-[#E9D5FF]">tu negocio al dia</span> siempre.
-</h1>
 
-              <p className="text-xl mb-8 text-white/90 leading-relaxed">
-                En Contadoor centralizamos contabilidad, impuestos y gestión laboral con un asesor directo que te acompaña todo el año, para que tengas la tranquilidad de saber que todo está en orden.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Button to="/cotizador" className="!bg-white !text-primary-600 shadow-brutal hover:shadow-none transform hover:translate-x-2 hover:translate-y-2 transition-all">
-                  Quiero tranquilidad para mi negocio
-                </Button>
-                <Button to="/contacto" className="!bg-primary-700 !text-white hover:!bg-primary-800 transition-transform duration-200 hover:scale-105 active:scale-95">
-                  Hablar con asesor
-                </Button>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
+                    Empresas de todas las industrias en Chile confían en nosotros
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
+                  </div>
+                </a>
+              </motion.div>
+
+              {/* Badge de garantía */}
+              <motion.div
+                variants={bounceIn}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: 0.2 }}
+                className="inline-block mb-6 ml-4"
+              >
+                <div className="bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-semibold border border-green-200">
+                  <span className="mr-2">🛡️</span>
+                  Garantía 60 días o te devolvemos el dinero
+                </div>
+              </motion.div>
+
+              <motion.h1
+                variants={slideUp}
+                initial="hidden"
+                animate="visible"
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="mb-6 leading-tight tracking-tight"
+                data-gtm="hero_headline"
+                role="banner"
+              >
+                <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white">
+                  Ahorra tiempo y evita multas.
+                </span>
+                <br />
+                <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium text-primary-200">
+                  Tu negocio <span className="underline decoration-primary-400 decoration-4">al día</span>, siempre.
+                </span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="text-lg md:text-xl mb-6 max-w-[56ch] opacity-90 leading-relaxed"
+              >
+                Contabilidad, impuestos y laboral en un solo lugar, con un asesor directo que te avisa antes de cada vencimiento.
+              </motion.p>
+
+              {/* Bullets de beneficios con iconos Lucide */}
+              <div className="mb-8 space-y-3">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                  className="flex items-start gap-3 text-base opacity-90"
+                >
+                  <motion.div
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ duration: 0.4, delay: 0.5, type: "spring" }}
+                    className="bg-green-500 p-1.5 rounded-full mt-0.5 flex-shrink-0"
+                  >
+                    <Bell size={14} className="text-white" />
+                  </motion.div>
+                  <span>Te avisamos antes de cada vencimiento</span>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.5 }}
+                  className="flex items-start gap-3 text-base opacity-90"
+                >
+                  <motion.div
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ duration: 0.4, delay: 0.6, type: "spring" }}
+                    className="bg-green-500 p-1.5 rounded-full mt-0.5 flex-shrink-0"
+                  >
+                    <MessageCircle size={14} className="text-white" />
+                  </motion.div>
+                  <span>Habla directo con tu asesor por WhatsApp</span>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.6 }}
+                  className="flex items-start gap-3 text-base opacity-90"
+                >
+                  <motion.div
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ duration: 0.4, delay: 0.7, type: "spring" }}
+                    className="bg-green-500 p-1.5 rounded-full mt-0.5 flex-shrink-0"
+                  >
+                    <FileText size={14} className="text-white" />
+                  </motion.div>
+                  <span>Informe mensual claro (sin letra chica)</span>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.7 }}
+                  className="flex items-start gap-3 text-base opacity-90"
+                >
+                  <motion.div
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ duration: 0.4, delay: 0.8, type: "spring" }}
+                    className="bg-green-500 p-1.5 rounded-full mt-0.5 flex-shrink-0"
+                  >
+                    <Rocket size={14} className="text-white" />
+                  </motion.div>
+                  <span>Onboarding en 48h con traspaso guiado</span>
+                </motion.div>
               </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+                className="space-y-4"
+              >
+                <div className="flex flex-wrap gap-4">
+                  <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
+                    <Button
+                      to="/cotizador"
+                      className="!bg-white !text-primary-600 hover:shadow-[6px_6px_0_#000000] transition-all focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 font-black shadow-[4px_4px_0_#000000] !py-4 !px-8 !text-base md:!text-lg"
+                      data-gtm="hero_cta_primary"
+                      aria-label="Cotizar mi plan de contabilidad"
+                    >
+                      Cotizar mi plan
+                    </Button>
+                  </motion.div>
+                  <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
+                    <Button
+                      to="/contacto"
+                      className="!bg-transparent !text-white border-2 border-white hover:!bg-white hover:!text-primary-600 transition-all focus:ring-2 focus:ring-white focus:ring-offset-2 font-bold flex items-center gap-2 !py-4 !px-8 !text-base md:!text-lg"
+                      data-gtm="hero_cta_secondary"
+                      aria-label="Hablar con un asesor ahora"
+                    >
+                      <MessageCircle size={18} />
+                      Hablar con un asesor
+                    </Button>
+                  </motion.div>
+                </div>
+                <div className="space-y-1">
+                  <motion.p
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, delay: 0.7, type: "spring" }}
+                    className="text-xs text-yellow-300 font-semibold bg-yellow-500/20 px-3 py-1 rounded-full inline-block border border-yellow-400/30"
+                  >
+                    ⚡ Solo 8 cupos disponibles este mes
+                  </motion.p>
+                  <p className="text-xs text-white/70">
+                    Respuesta en &lt;15 min hábiles.
+                  </p>
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.8 }}
+                    className="text-xs text-white/60"
+                  >
+                    100% gratis, sin compromiso.
+                  </motion.p>
+                </div>
+              </motion.div>
             </motion.div>
-            
+
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="relative hidden lg:block"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              whileInView={{ y: [-5, 5, -5] }}
+              transition={{
+                duration: 0.6,
+                ease: "easeOut",
+                delay: 0.15,
+                y: { duration: 6, repeat: Infinity, ease: "easeInOut" }
+              }}
+              className="relative mt-8 lg:mt-0 flex justify-center lg:block"
+              data-gtm="hero_image"
             >
-              <div className="absolute inset-0 bg-white/60 rounded-2xl transform rotate-6 scale-105" />
-              <img 
-                src="/hero.jpg" 
-                alt="Dashboard financiero"
-                className="rounded-2xl shadow-2xl relative z-10"
+              <div className="absolute inset-0 bg-white/60 rounded-2xl transform rotate-6 scale-105 h-[300px] w-[240px] md:h-[400px] md:w-[320px] lg:h-[520px] lg:w-[400px]" />
+              <img
+                src="/hero.jpg"
+                alt="Equipo profesional de Contadoor trabajando"
+                className="rounded-2xl shadow-xl shadow-primary-900/20 relative z-10 object-cover h-[300px] w-[240px] md:h-[400px] md:w-[320px] lg:h-[520px] lg:w-[400px] object-top"
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
               />
             </motion.div>
           </div>
         </Container>
       </section>
 
-      {/* Problema - Con diseño más dinámico */}
-      <section className="py-20 relative bg-gradient-to-b from-gray-50 to-white overflow-hidden">
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0" style={{
-            backgroundSize: '40px 40px',
-            backgroundImage: 'radial-gradient(circle at 1px 1px, #A0569A 1px, transparent 1px)'
-          }} />
-        </div>
-        
-        <Container className="relative z-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeIn}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="text-center mb-16">
-              <span className="text-primary-600 font-semibold text-sm uppercase tracking-wider">Somos la puerta a tu solución</span>
-             <h2 className="text-4xl md:text-5xl font-black mt-4 mb-6">
-  Muchos dueños de negocios han{' '}
-  <span className="text-primary-600">vivido lo mismo</span>
-</h2>
 
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                En Contadoor lo hacemos diferente. Nuestro compromiso es estar a tu lado siempre.
+      {/* Problemas comunes que resolvemos */}
+      <section className="bg-[#F7F9FB] py-16 lg:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Título principal mejorado */}
+          <div className="text-center">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-4xl md:text-5xl font-extrabold tracking-tight"
+            >
+              Lo que hoy te frena… <span className="text-primary-600">y cómo lo resolvemos</span>
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-gray-600 max-w-4xl mx-auto mt-4 text-lg"
+            >
+              Estos son los dolores más comunes que viven los empresarios, y cómo en Contadoor los transformamos en soluciones reales.
+            </motion.p>
+          </div>
 
+          {/* Grid de cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mt-16 pt-6 overflow-visible">
+            {/* Card 1 - Contador fantasma */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="rounded-3xl bg-white border border-gray-200 shadow-[0_10px_30px_rgba(17,24,39,0.06)] p-6 md:p-8 relative hover:shadow-xl hover:shadow-primary-200/30 transition-all duration-300 mt-6 cursor-pointer"
+              data-gtm="pain_point_1"
+            >
+              {/* Número flotante */}
+              <div className="absolute -top-4 right-6 md:right-10 w-9 h-9 rounded-full grid place-items-center bg-primary-600 text-white font-semibold">
+                1
+              </div>
+
+              {/* Icon wrapper */}
+              <div className="bg-primary-100 p-3 rounded-full w-fit mb-4">
+                <span className="text-xl">⏱️</span>
+              </div>
+
+              {/* Contenido */}
+              <h3 className="text-xl font-semibold mt-3 text-gray-900">Contador fantasma</h3>
+              <p className="text-gray-600 mt-2 leading-relaxed">
+                Solo aparece a fin de mes para cobrar, pero nunca cuando lo necesitas.
               </p>
-            </div>
-            
-            <div className="grid md:grid-cols-3 gap-8">
-              <motion.div
-                whileHover={{ y: -8, transition: { duration: 0.2 } }}
-                className="bg-white rounded-2xl p-8 shadow-soft hover:shadow-xl transition-all border border-gray-100"
-              >
-                <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center mb-6">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+
+              {/* Divisor */}
+              <div className="mt-6 mb-3 h-px bg-gray-200"></div>
+
+              {/* Pie con nivel de impacto */}
+              <div className="flex items-center justify-between">
+                <span className="text-primary-600 font-medium text-sm">Alto impacto</span>
+                <div className="flex gap-1">
+                  <motion.div
+                    animate={{ opacity: [1, 0.3, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="text-primary-600"
+                  >
+                    ●●●
+                  </motion.div>
                 </div>
-                <h3 className="text-xl font-bold mb-3">Contador fantasma</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Un contador que solo aparece a fin de mes para decir cuánto pagar
-                </p>
+              </div>
+            </motion.div>
+
+            {/* Card 2 - Destacada */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              whileHover={{ scale: 1.05, y: -5 }}
+              animate={{
+                scale: [1, 1.02, 1],
+                transition: {
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatDelay: 6
+                }
+              }}
+              className="rounded-3xl bg-primary-600 shadow-[0_12px_35px_rgba(17,24,39,0.08)] p-6 md:p-8 relative hover:shadow-2xl hover:shadow-primary-200/40 transition-all duration-300 mt-6 md:scale-105 cursor-pointer"
+              data-gtm="pain_point_2"
+            >
+              {/* Badge "MÁS COMÚN" con icono */}
+              <motion.div
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="absolute -top-4 left-6 md:left-10 px-3 py-1 rounded-full bg-white text-primary-600 text-xs font-semibold shadow flex items-center gap-1"
+              >
+                🔥 MÁS COMÚN
               </motion.div>
 
-              <motion.div
-                whileHover={{ y: -8, transition: { duration: 0.2 } }}
-                className="bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-2xl p-8 shadow-soft hover:shadow-xl transition-all"
-              >
-                <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center mb-6">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold mb-3">Comunicación confusa</h3>
-                <p className="text-white/90 leading-relaxed">
-                  Comunicación confusa y tardía que genera incertidumbre
-                </p>
-              </motion.div>
+              {/* Número flotante */}
+              <div className="absolute -top-4 right-6 md:right-10 w-9 h-9 rounded-full grid place-items-center bg-white text-primary-600 font-semibold">
+                2
+              </div>
 
-              <motion.div
-                whileHover={{ y: -8, transition: { duration: 0.2 } }}
-                className="bg-white rounded-2xl p-8 shadow-soft hover:shadow-xl transition-all border border-gray-100"
-              >
-                <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center mb-6">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+              {/* Icon wrapper */}
+              <div className="bg-white/20 p-3 rounded-full w-fit mb-4">
+                <span className="text-white text-xl">⚠️</span>
+              </div>
+
+              {/* Contenido */}
+              <h3 className="text-xl font-semibold mt-3 text-white">Comunicación confusa</h3>
+              <p className="text-white/90 mt-2 leading-relaxed">
+                Respuestas tardías, correos eternos y cero claridad.
+              </p>
+
+              {/* Divisor */}
+              <div className="mt-6 mb-3 h-px bg-white/20"></div>
+
+              {/* Pie con nivel de impacto */}
+              <div className="flex items-center justify-between">
+                <span className="text-white/90 font-medium text-sm">Alto impacto</span>
+                <div className="flex gap-1">
+                  <motion.div
+                    animate={{ opacity: [1, 0.3, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+                    className="text-white"
+                  >
+                    ●●●
+                  </motion.div>
                 </div>
-                <h3 className="text-xl font-bold mb-3">Estrés constante</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Multas, atrasos y estrés por asesorías que no entienden tu negocio
-                </p>
-              </motion.div>
+              </div>
+            </motion.div>
+
+            {/* Card 3 - Estrés constante */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.7 }}
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="rounded-3xl bg-white border border-gray-200 shadow-[0_10px_30px_rgba(17,24,39,0.06)] p-6 md:p-8 relative hover:shadow-xl hover:shadow-primary-200/30 transition-all duration-300 mt-6 cursor-pointer"
+              data-gtm="pain_point_3"
+            >
+              {/* Número flotante */}
+              <div className="absolute -top-4 right-6 md:right-10 w-9 h-9 rounded-full grid place-items-center bg-primary-600 text-white font-semibold">
+                3
+              </div>
+
+              {/* Icon wrapper */}
+              <div className="bg-primary-100 p-3 rounded-full w-fit mb-4">
+                <span className="text-xl">😟</span>
+              </div>
+
+              {/* Contenido */}
+              <h3 className="text-xl font-semibold mt-3 text-gray-900">Estrés constante</h3>
+              <p className="text-gray-600 mt-2 leading-relaxed">
+                Multas, atrasos y cero tranquilidad porque nadie entiende realmente tu negocio.
+              </p>
+
+              {/* Divisor */}
+              <div className="mt-6 mb-3 h-px bg-gray-200"></div>
+
+              {/* Pie con nivel de impacto */}
+              <div className="flex items-center justify-between">
+                <span className="text-primary-600 font-medium text-sm">Alto impacto</span>
+                <div className="flex gap-1">
+                  <motion.div
+                    animate={{ opacity: [1, 0.3, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+                    className="text-primary-600"
+                  >
+                    ●●●
+                  </motion.div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Texto inferior + CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+            className="text-center"
+          >
+            <p className="text-gray-600 mt-10">
+              En Contadoor transformamos estos problemas en soluciones concretas
+            </p>
+            <div className="mt-6">
+              <Link to="/cotizador">
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 1, type: "spring", damping: 20 }}
+                  whileHover={{ y: -2, boxShadow: '6px 6px 0 #000' }}
+                  whileActive={{ y: 0, boxShadow: '2px 2px 0 #000' }}
+                  className="inline-flex items-center px-6 py-3 rounded-full bg-primary-600 text-white font-semibold transition"
+                  style={{ boxShadow: '4px 4px 0 #000' }}
+                  data-gtm="pain_solution_cta"
+                  aria-label="Quiero resolver estos problemas ahora con Contadoor"
+                >
+                  Quiero resolver estos problemas ahora →
+                </motion.button>
+              </Link>
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 1.2 }}
+                className="text-sm text-gray-600 mt-3 font-medium"
+              >
+                ⏰ <span className="font-bold text-red-600">Últimos 3 días</span> del diagnóstico gratuito
+              </motion.p>
             </div>
           </motion.div>
-        </Container>
+        </div>
       </section>
 
-      {/* Cómo funciona - Con imagen de fondo y diseño moderno */}
+      {/* Testimonios/Casos de Éxito - Prueba social */}
+      <section className="py-16 lg:py-24 bg-gradient-to-br from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex px-3 py-1 rounded-full bg-primary-50 text-primary-600 text-xs font-semibold ring-1 ring-primary-200 mb-4">
+              ⭐ CASOS REALES
+            </div>
+            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
+              Empresas reales, <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-400">resultados reales</span>
+            </h2>
+            <p className="text-gray-600 mt-4 max-w-2xl mx-auto text-lg">
+              Más de 500 empresas confían en nosotros. Aquí tienes algunos casos de éxito.
+            </p>
+
+            {/* Badge de urgencia */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3, type: "spring" }}
+              className="mt-6 inline-flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-full text-sm font-semibold"
+            >
+              🔥 Solo tomamos 12 clientes nuevos por mes
+            </motion.div>
+          </motion.div>
+
+          {/* Grid de testimonios */}
+          <div className="grid md:grid-cols-3 gap-8 items-stretch">
+
+            {/* Testimonio 1 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 relative flex flex-col h-full"
+              data-gtm="testimonial_card_1"
+            >
+              <Quote className="absolute top-4 right-4 w-8 h-8 text-primary-200" />
+
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                ))}
+              </div>
+
+              <blockquote className="text-gray-700 mb-6 leading-relaxed flex-grow">
+                "Con Contadoor llevamos 2 años sin ninguna multa. Antes pagábamos $180.000 mensuales en multas por atrasos. Ahora tenemos todo al día y gastamos $0 en multas."
+              </blockquote>
+
+              <div className="mt-auto">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center font-bold text-primary-600">
+                    CM
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-900">Carlos Mendoza</div>
+                    <div className="text-sm text-gray-500">CEO, Constructora del Valle</div>
+                    <div className="text-xs text-primary-600 font-medium">Cliente desde 2022</div>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                  <div className="text-green-700 font-semibold text-sm">Resultado: $0 en multas en 24 meses</div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Testimonio 2 - Destacado */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="bg-gradient-to-br from-primary-600 to-primary-700 text-white rounded-2xl p-8 shadow-xl relative md:scale-105 flex flex-col h-full"
+              data-gtm="testimonial_card_featured"
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.5, type: "spring" }}
+                className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white text-primary-600 px-3 py-1 rounded-full text-xs font-black"
+              >
+                ⭐ CASO DESTACADO
+              </motion.div>
+
+              <Quote className="absolute top-4 right-4 w-8 h-8 text-white/30" />
+
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-yellow-300 text-yellow-300" />
+                ))}
+              </div>
+
+              <blockquote className="text-white/95 mb-6 leading-relaxed font-medium flex-grow">
+                "Pasamos de estar siempre estresados por los vencimientos a dormir tranquilos. El WhatsApp directo con nuestro asesor es oro puro. Responden en menos de 10 minutos."
+              </blockquote>
+
+              <div className="mt-auto">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center font-bold text-white">
+                    AS
+                  </div>
+                  <div>
+                    <div className="font-semibold text-white">Ana Soto</div>
+                    <div className="text-sm text-white/80">Gerente, Importadora Pacific</div>
+                    <div className="text-xs text-white/70">Cliente desde 2021</div>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-white/10 backdrop-blur rounded-lg border border-white/20">
+                  <div className="text-white font-semibold text-sm">Resultado: Respuesta promedio 8 minutos</div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Testimonio 3 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 relative flex flex-col h-full"
+              data-gtm="testimonial_card_3"
+            >
+              <Quote className="absolute top-4 right-4 w-8 h-8 text-primary-200" />
+
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                ))}
+              </div>
+
+              <blockquote className="text-gray-700 mb-6 leading-relaxed flex-grow">
+                "El traspaso fue súper fácil. En 48 horas ya tenían todo funcionando. Ahora entiendo realmente cómo va mi negocio gracias a sus informes claros."
+              </blockquote>
+
+              <div className="mt-auto">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center font-bold text-primary-600">
+                    MR
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-900">Miguel Ramírez</div>
+                    <div className="text-sm text-gray-500">Dueño, Restaurante El Encuentro</div>
+                    <div className="text-xs text-primary-600 font-medium">Cliente desde 2023</div>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="text-blue-700 font-semibold text-sm">Resultado: Onboarding en 48 horas</div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Stats de confianza */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
+          >
+            <div>
+              <div className="text-3xl md:text-4xl font-extrabold text-primary-600">
+                <AnimatedBenefit end={500} suffix="+" duration={2000} />
+              </div>
+              <div className="text-sm text-gray-600 mt-1">Empresas activas</div>
+            </div>
+            <div>
+              <div className="text-3xl md:text-4xl font-extrabold text-primary-600">
+                <AnimatedBenefit end={98} suffix="%" duration={2200} />
+              </div>
+              <div className="text-sm text-gray-600 mt-1">Nos recomienda</div>
+            </div>
+            <div>
+              <div className="text-3xl md:text-4xl font-extrabold text-primary-600">
+                <AnimatedBenefit end={3} duration={1800} />
+              </div>
+              <div className="text-sm text-gray-600 mt-1">Años promedio como cliente</div>
+            </div>
+            <div>
+              <div className="text-3xl md:text-4xl font-extrabold text-primary-600">
+                <AnimatedBenefit end={15} suffix=" min" duration={2500} />
+              </div>
+              <div className="text-sm text-gray-600 mt-1">Tiempo de respuesta</div>
+            </div>
+          </motion.div>
+
+          {/* CTA con urgencia */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="text-center mt-16"
+          >
+            <Link to="/cotizador">
+              <motion.button
+                whileHover={{ y: -3, scale: 1.05 }}
+                whileActive={{ y: 0, scale: 0.98 }}
+                className="inline-flex items-center gap-2 px-10 py-5 rounded-full bg-primary-600 text-white font-black text-lg transition-all duration-300 hover:shadow-[6px_6px_0_#000]"
+                style={{ boxShadow: '4px 4px 0 #000' }}
+                data-gtm="testimonials_cta"
+                aria-label="Quiero ser el próximo caso de éxito"
+              >
+                🚀 Quiero ser el próximo caso de éxito →
+              </motion.button>
+            </Link>
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+              className="text-sm text-gray-600 mt-4 font-medium"
+            >
+              Quedan <span className="font-bold text-red-600">7 cupos</span> para este mes.
+            </motion.p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Cómo funciona - Timeline mejorado */}
       <section className="py-20 relative overflow-hidden">
         <div className="absolute inset-0">
-          <img 
+          <img
             src="/foto1.jpg"
             alt=""
             className="w-full h-full object-cover opacity-5"
           />
         </div>
-        
+
         <Container className="relative z-10">
           <motion.div
             initial="hidden"
@@ -164,365 +893,1131 @@ export default function Inicio() {
             variants={fadeIn}
             transition={{ duration: 0.5 }}
           >
-            <div className="text-center mb-16">
-              <span className="text-primary-600 font-semibold text-sm uppercase tracking-wider">Nuestro proceso</span>
-              <h2 className="text-4xl md:text-5xl font-black mt-4">
-                Cómo funciona Contadoor
-              </h2>
+            {/* Título y subtítulo mejorados */}
+            <div className="text-center mb-20">
+              <motion.span
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, type: "spring" }}
+                className="inline-block text-primary-600 font-semibold text-sm uppercase tracking-wider bg-primary-50 px-4 py-2 rounded-full"
+              >
+                🚀 NUESTRO PROCESO
+              </motion.span>
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="text-4xl md:text-5xl font-black mt-6"
+              >
+                Así de simple es trabajar con Contadoor 🚀
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="text-xl text-gray-600 mt-4 max-w-2xl mx-auto font-medium"
+              >
+                4 pasos claros para que tu negocio esté al día, siempre.
+              </motion.p>
             </div>
-            
-            <div className="grid md:grid-cols-4 gap-8 relative">
-              {/* Línea conectora */}
-              <div className="hidden md:block absolute top-12 left-0 right-0 h-0.5 bg-gradient-to-r from-primary-200 via-primary-400 to-primary-200" />
-              
-              {[
-                { 
-                  step: '1', 
-                  title: 'Diagnóstico inicial', 
-                  desc: 'Revisamos tu contabilidad, impuestos y gestión laboral para detectar riesgos y oportunidades'
-                },
-                { 
-                  step: '2', 
-                  title: 'Plan personalizado', 
-                  desc: 'Creamos un calendario de cumplimiento que prioriza lo urgente y organiza todo el año'
-                },
-                { 
-                  step: '3', 
-                  title: 'Acompañamiento constante', 
-                  desc: 'Tendrás un asesor directo, comunicación fluida y reportes claros'
-                },
-                { 
-                  step: '4', 
-                  title: 'Todo en un lugar', 
-                  desc: 'Centralizamos tu cumplimiento legal, tributario y laboral, evitando errores'
-                }
-              ].map((item, index) => (
-                <motion.div 
-                  key={item.step} 
-                  className="text-center relative"
-                  initial={{ opacity: 0, y: 20 }}
+
+            {/* Timeline horizontal en desktop, vertical en mobile */}
+            <div className="relative">
+              {/* Línea conectora animada - Desktop */}
+              <div className="hidden md:block">
+                <div className="absolute top-12 left-0 right-0 h-1 bg-gray-200 rounded-full" />
+                <motion.div
+                  initial={{ width: 0 }}
+                  whileInView={{ width: "100%" }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 2, delay: 0.5 }}
+                  className="absolute top-12 left-0 h-1 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full"
+                />
+              </div>
+
+              {/* Línea conectora animada - Mobile */}
+              <div className="md:hidden absolute left-12 top-0 bottom-0 w-1 bg-gray-200 rounded-full" />
+              <motion.div
+                initial={{ height: 0 }}
+                whileInView={{ height: "100%" }}
+                viewport={{ once: true }}
+                transition={{ duration: 2, delay: 0.5 }}
+                className="md:hidden absolute left-12 top-0 w-1 bg-gradient-to-b from-primary-400 to-primary-600 rounded-full"
+              />
+
+              <div className="grid md:grid-cols-4 gap-8 md:gap-4">
+                {/* Paso 1 */}
+                <motion.div
+                  className="text-center md:text-center relative"
+                  initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                  data-gtm="process_step_1"
                 >
                   <div className="relative z-10">
-                    <div className="w-24 h-24 bg-gradient-to-br from-primary-400 to-primary-600 text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-4 shadow-lg">
-                      {item.step}
-                    </div>
-                    <div className="w-16 h-16 bg-gradient-to-br from-primary-100 to-primary-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <svg className="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        {index === 0 && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />}
-                        {index === 1 && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />}
-                        {index === 2 && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />}
-                        {index === 3 && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />}
-                      </svg>
-                    </div>
-                    <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                    <p className="text-gray-600">{item.desc}</p>
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      className="w-28 h-28 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl hover:shadow-2xl transition-all cursor-pointer group relative"
+                    >
+                      <SearchCheck size={32} />
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.5, type: "spring" }}
+                      className="inline-flex items-center justify-center w-8 h-8 bg-primary-600 text-white text-sm font-bold rounded-full mb-4 shadow-lg"
+                    >
+                      1
+                    </motion.div>
+                    <h3 className="text-xl font-bold mb-3">Diagnóstico inicial</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed max-w-xs mx-auto">Revisamos tu contabilidad e impuestos, detectando riesgos y oportunidades.</p>
                   </div>
                 </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </Container>
-      </section>
 
-      {/* Beneficios - Sección morada con diseño moderno */}
-      <section className="py-20 relative bg-gradient-to-br from-primary-600 via-primary-500 to-primary-700 text-white overflow-hidden">
-        {/* Patrón decorativo */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 100px, rgba(255,255,255,0.1) 100px, rgba(255,255,255,0.1) 101px)',
-            backgroundSize: '101px 101px'
-          }} />
-        </div>
-        
-        {/* Círculos decorativos */}
-        <div className="absolute -top-20 -right-20 w-80 h-80 bg-white/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-white/5 rounded-full blur-3xl" />
-        
-        <Container className="relative z-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeIn}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black mb-6">
-                Beneficios clave de trabajar con nosotros
-              </h2>
-              <p className="text-xl text-white/90 max-w-2xl mx-auto">
-                Más que un servicio contable, un socio para tu crecimiento
-              </p>
-            </div>
-            
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                {
-                  title: 'Delegas con confianza',
-                  desc: 'Mantén el control total mientras nosotros hacemos el trabajo',
-                  metric: '100%'
-                },
-                {
-                  title: 'Evitas multas y errores',
-                  desc: 'Prevenimos problemas antes de que ocurran',
-                  metric: '0'
-                },
-                {
-                  title: 'Comunicación clara',
-                  desc: 'Respuestas rápidas y reportes que sí entiendes',
-                  metric: '24/7'
-                },
-                {
-                  title: 'Transparencia total',
-                  desc: 'Puedes ver todo lo que hacemos en tiempo real',
-                  metric: '360°'
-                },
-                {
-                  title: 'Más tiempo para crecer',
-                  desc: 'Enfócate en tu negocio, nosotros del resto',
-                  metric: '+8hrs semanales'
-                },
-                {
-                  title: 'Un solo equipo',
-                  desc: 'Contabilidad, impuestos y laboral integrados',
-                  metric: '3en1'
-                }
-              ].map((benefit, index) => (
+                {/* Paso 2 */}
                 <motion.div
-                  key={index}
-                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all"
-                  initial={{ opacity: 0, y: 20 }}
+                  className="text-center md:text-center relative"
+                  initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.6, delay: 0.5 }}
+                  data-gtm="process_step_2"
                 >
-                  <div className="text-3xl font-black text-white/90 mb-3">{benefit.metric}</div>
-                  <h3 className="text-xl font-bold mb-2">{benefit.title}</h3>
-                  <p className="text-white/80 text-sm leading-relaxed">
-                    {benefit.desc}
-                  </p>
+                  <div className="relative z-10">
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      className="w-28 h-28 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl hover:shadow-2xl transition-all cursor-pointer group relative"
+                    >
+                      <CalendarCheck size={32} />
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.7, type: "spring" }}
+                      className="inline-flex items-center justify-center w-8 h-8 bg-primary-600 text-white text-sm font-bold rounded-full mb-4 shadow-lg"
+                    >
+                      2
+                    </motion.div>
+                    <h3 className="text-xl font-bold mb-3">Plan personalizado</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed max-w-xs mx-auto">Creamos un calendario simple y claro, priorizando lo urgente.</p>
+                  </div>
                 </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </Container>
-      </section>
 
-      {/* Diferenciadores - Diseño DISRUPTIVO con división diagonal */}
-      <section className="relative py-0 overflow-hidden">
-        {/* Fondo dividido diagonalmente */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[#65276B]" />
-          <div className="absolute inset-0 bg-primary-600" style={{
-            clipPath: 'polygon(50% 0, 100% 0, 100% 100%, 0 100%)'
-          }} />
-        </div>
-
-        <Container className="relative z-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeIn}
-            transition={{ duration: 0.5 }}
-            className="py-20 lg:py-32"
-          >
-            {/* Header central */}
-            <div className="text-center mb-20">
-              <motion.span 
-                initial={{ scale: 0 }}
-                whileInView={{ scale: 1 }}
-                transition={{ duration: 0.5, type: "spring" }}
-                className="inline-block px-8 py-4 bg-white text-black rounded-full text-lg font-black uppercase tracking-wider mb-6 shadow-2xl"
-              >
-                LA DIFERENCIA
-              </motion.span>
-              <motion.h2 
-                initial={{ y: 50, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.6 }}
-                className="text-6xl md:text-7xl lg:text-8xl font-black text-white"
-              >
-                Por qué somos
-                <span className="block text-white/20" style={{ WebkitTextStroke: '2px white', WebkitTextFillColor: 'transparent' }}>
-                  DIFERENTES
-                </span>
-              </motion.h2>
-            </div>
-            
-            {/* Contenido dividido */}
-            <div className="grid lg:grid-cols-2 gap-0 max-w-7xl mx-auto">
-              {/* NO ES - Lado izquierdo */}
-              <motion.div 
-                initial={{ x: -100, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.6 }}
-                className="p-8 lg:p-12"
-              >
-                <div className="text-center lg:text-left mb-10">
-                  <h3 className="text-5xl lg:text-6xl font-black text-white mb-4">
-                    Esto <span className="bg-red-600 px-4 py-2 rounded-xl">NO</span>
-                  </h3>
-                  <p className="text-3xl font-bold text-white/80">es Contadoor</p>
-                </div>
-                
-                <div className="space-y-6">
-                  {[
-                    'Un contador independiente que no responde',
-                    'Una empresa contable fría e impersonal',
-                    'Un software que no te asesora',
-                    'Un servicio que reacciona cuando ya es tarde'
-                  ].map((item, index) => (
+                {/* Paso 3 */}
+                <motion.div
+                  className="text-center md:text-center relative"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.7 }}
+                  data-gtm="process_step_3"
+                >
+                  <div className="relative z-10">
                     <motion.div
-                      key={index}
-                      initial={{ x: -50, opacity: 0 }}
-                      whileInView={{ x: 0, opacity: 1 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="flex items-center group"
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      className="w-28 h-28 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl hover:shadow-2xl transition-all cursor-pointer group relative"
                     >
-                      <div className="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center flex-shrink-0 mr-6 group-hover:scale-110 transition-transform shadow-xl">
-                        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </div>
-                      <span className="text-xl lg:text-2xl text-white font-medium">{item}</span>
+                      <Handshake size={32} />
                     </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-              
-              {/* SÍ ES - Lado derecho */}
-              <motion.div 
-                initial={{ x: 100, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.6 }}
-                className="p-8 lg:p-12"
-              >
-                <div className="text-center lg:text-right mb-10">
-                  <h3 className="text-5xl lg:text-6xl font-black text-white mb-4">
-                    Esto <span className="bg-white text-primary-600 px-4 py-2 rounded-xl">SÍ</span>
-                  </h3>
-                  <p className="text-3xl font-bold text-white/80">es Contadoor</p>
-                </div>
-                
-                <div className="space-y-6">
-                  {[
-                    'Acompañamiento personalizado todo el año',
-                    'Un sistema proactivo que previene problemas',
-                    'Un solo equipo para todas tus obligaciones',
-                    'Cercanía, claridad y confianza en cada paso'
-                  ].map((item, index) => (
                     <motion.div
-                      key={index}
-                      initial={{ x: 50, opacity: 0 }}
-                      whileInView={{ x: 0, opacity: 1 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="flex items-center justify-end group"
+                      initial={{ opacity: 0, scale: 0 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.9, type: "spring" }}
+                      className="inline-flex items-center justify-center w-8 h-8 bg-primary-600 text-white text-sm font-bold rounded-full mb-4 shadow-lg"
                     >
-                      <span className="text-xl lg:text-2xl text-white font-medium mr-6 text-right">{item}</span>
-                      <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform shadow-xl">
-                        <svg className="w-10 h-10 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
+                      3
                     </motion.div>
-                  ))}
-                </div>
-              </motion.div>
+                    <h3 className="text-xl font-bold mb-3">Acompañamiento constante</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed max-w-xs mx-auto">Un asesor directo que responde rápido y entrega reportes claros.</p>
+                  </div>
+                </motion.div>
+
+                {/* Paso 4 */}
+                <motion.div
+                  className="text-center md:text-center relative"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.9 }}
+                  data-gtm="process_step_4"
+                >
+                  <div className="relative z-10">
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      className="w-28 h-28 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl hover:shadow-2xl transition-all cursor-pointer group relative"
+                    >
+                      <BarChart3 size={32} />
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 1.1, type: "spring" }}
+                      className="inline-flex items-center justify-center w-8 h-8 bg-primary-600 text-white text-sm font-bold rounded-full mb-4 shadow-lg"
+                    >
+                      4
+                    </motion.div>
+                    <h3 className="text-xl font-bold mb-3">Todo en un lugar</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed max-w-xs mx-auto">Centralizamos lo legal, tributario y laboral para que no pierdas tiempo.</p>
+                  </div>
+                </motion.div>
+              </div>
             </div>
 
-            {/* CTA Central */}
+            {/* CTA final brutalista */}
             <motion.div
-              initial={{ y: 50, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.6 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 1.3 }}
               className="text-center mt-20"
             >
-                <Button to="/por-que-contadoor" className="!bg-white !text-black hover:bg-gray-100 text-lg px-10 py-5 font-bold shadow-2xl transform hover:scale-105 transition-all">
-                Descubre la diferencia completa →
-              </Button>
+              <Link to="/cotizador">
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 1.5, type: "spring", damping: 20 }}
+                  whileHover={{ y: -3, scale: 1.05 }}
+                  whileActive={{ y: 0, scale: 0.98 }}
+                  className="inline-flex items-center px-10 py-5 rounded-full bg-primary-600 text-white font-black text-lg transition-all duration-300 hover:shadow-[6px_6px_0_#000]"
+                  style={{ boxShadow: '4px 4px 0 #000' }}
+                  data-gtm="process_cta"
+                  aria-label="Quiero empezar en 4 pasos con Contadoor"
+                >
+                  🚀 Quiero empezar en 4 pasos →
+                </motion.button>
+              </Link>
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 1.7 }}
+                className="text-sm text-gray-600 mt-4 font-medium"
+              >
+                🔥 Solo quedan 4 cupos para este mes
+              </motion.p>
             </motion.div>
           </motion.div>
         </Container>
       </section>
 
-      {/* CTA Final - Con imagen de fondo y diseño impactante */}
-      <section className="relative py-24 overflow-hidden">
-        {/* Fondo con imagen y overlay */}
-        <div className="absolute inset-0">
-          <img 
-            src="/final.jpg"
-            alt=""
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/90 to-black/70" />
-        </div>
-        
-        {/* Contenido */}
-        <Container className="relative z-10">
+      {/* Beneficios - Rediseño 2025 optimizado */}
+      <section className="relative overflow-hidden text-white py-16 lg:py-24" style={{ background: 'linear-gradient(to bottom, #6F326A, #8A3F83)' }}>
+        {/* Patrón de puntos sutil */}
+        <div
+          className="absolute inset-0 opacity-30"
+          style={{
+            backgroundImage: 'radial-gradient(#ffffff14 1px, transparent 1px)',
+            backgroundSize: '18px 18px'
+          }}
+        />
+
+        {/* Vignette blobs */}
+        <div className="absolute -top-20 -right-20 w-80 h-80 bg-white/5 rounded-full blur-3xl opacity-30" />
+        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-white/5 rounded-full blur-3xl opacity-30" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeIn}
             transition={{ duration: 0.5 }}
-            className="text-center text-white max-w-4xl mx-auto"
           >
-            <div className="inline-block mb-8">
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
-                <div className="flex -space-x-2">
-                  {[1,2,3,4,5].map(i => (
-                    <div key={i} className="w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full border-2 border-white" />
-                  ))}
+            {/* Header mejorado con mesh gradient */}
+            <div className="text-center mb-16 relative">
+              {/* Mesh gradient sutil detrás del título */}
+              <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-96 h-32 bg-gradient-to-r from-white/5 to-primary-200/10 rounded-full blur-3xl" />
+
+              <div className="inline-flex px-4 py-2 rounded-full bg-white/10 text-primary-300 text-xs font-semibold ring-1 ring-white/15 mb-6">
+                ✨ BENEFICIOS 2025
+              </div>
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="text-4xl md:text-5xl font-extrabold tracking-tight relative z-10"
+              >
+                Beneficios que verás <span className="text-primary-300">desde el primer mes</span>
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="text-white/90 mt-4 max-w-3xl mx-auto text-lg"
+              >
+                No solo hacemos contabilidad, te damos claridad, tiempo y crecimiento real.
+              </motion.p>
+            </div>
+
+            {/* Grid de KPIs */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+
+              {/* Card 1 - Confianza */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="rounded-xl p-6 bg-white/10 backdrop-blur border border-white/20 hover:-translate-y-2 hover:shadow-lg hover:shadow-primary-200/30 transition-all duration-300 group cursor-pointer"
+                data-gtm="benefit_card_tranquilidad"
+              >
+                <div className="flex items-start gap-4">
+                  <motion.div
+                    whileHover={{ rotate: 10, scale: 1.15 }}
+                    className="bg-white p-3 rounded-full text-primary-600 flex-shrink-0 shadow-lg"
+                  >
+                    <ShieldCheck size={24} />
+                  </motion.div>
+                  <div className="flex-1">
+                    <div className="text-5xl md:text-6xl font-extrabold leading-none mb-3">
+                      <AnimatedBenefit end={100} suffix="%" duration={2500} />
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">de tranquilidad</h3>
+                    <p className="text-white/80 text-sm opacity-90">Controlas tu negocio, nosotros el papeleo.</p>
+                  </div>
                 </div>
-                <span className="text-sm font-semibold ml-2">+500 empresas activas</span>
+              </motion.div>
+
+              {/* Card 2 - Multas */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="rounded-xl p-6 bg-white/10 backdrop-blur border border-white/20 hover:-translate-y-2 hover:shadow-lg hover:shadow-primary-200/30 transition-all duration-300 group cursor-pointer"
+                data-gtm="benefit_card_multas"
+              >
+                <div className="flex items-start gap-4">
+                  <motion.div
+                    whileHover={{ rotate: 10, scale: 1.15 }}
+                    className="bg-white p-3 rounded-full text-primary-600 flex-shrink-0 shadow-lg"
+                  >
+                    <Ban size={24} />
+                  </motion.div>
+                  <div className="flex-1">
+                    <div className="text-5xl md:text-6xl font-extrabold leading-none mb-3">
+                      <AnimatedBenefit end={0} duration={2000} />
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">multas</h3>
+                    <p className="text-white/80 text-sm opacity-90">Prevenimos problemas antes de que ocurran.</p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Card 3 - Soporte */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="rounded-xl p-6 bg-white/10 backdrop-blur border border-white/20 hover:-translate-y-2 hover:shadow-lg hover:shadow-primary-200/30 transition-all duration-300 group cursor-pointer"
+                data-gtm="benefit_card_soporte"
+              >
+                <div className="flex items-start gap-4">
+                  <motion.div
+                    whileHover={{ rotate: 10, scale: 1.15 }}
+                    className="bg-white p-3 rounded-full text-primary-600 flex-shrink-0 shadow-lg"
+                  >
+                    <Headphones size={24} />
+                  </motion.div>
+                  <div className="flex-1">
+                    <div className="text-5xl md:text-6xl font-extrabold leading-none mb-3">
+                      24/7
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">Soporte</h3>
+                    <p className="text-white/80 text-sm opacity-90">Comunicación directa y sin esperas.</p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Card 4 - Visibilidad */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="rounded-xl p-6 bg-white/10 backdrop-blur border border-white/20 hover:-translate-y-2 hover:shadow-lg hover:shadow-primary-200/30 transition-all duration-300 group cursor-pointer"
+                data-gtm="benefit_card_transparencia"
+              >
+                <div className="flex items-start gap-4">
+                  <motion.div
+                    whileHover={{ rotate: 10, scale: 1.15 }}
+                    className="bg-white p-3 rounded-full text-primary-600 flex-shrink-0 shadow-lg"
+                  >
+                    <Eye size={24} />
+                  </motion.div>
+                  <div className="flex-1">
+                    <div className="text-5xl md:text-6xl font-extrabold leading-none mb-3">
+                      360°
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">de transparencia</h3>
+                    <p className="text-white/80 text-sm opacity-90">Todo en tiempo real.</p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Card 5 - Tiempo */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="rounded-xl p-6 bg-white/10 backdrop-blur border border-white/20 hover:-translate-y-2 hover:shadow-lg hover:shadow-primary-200/30 transition-all duration-300 group cursor-pointer"
+                data-gtm="benefit_card_tiempo"
+              >
+                <div className="flex items-start gap-4">
+                  <motion.div
+                    whileHover={{ rotate: 10, scale: 1.15 }}
+                    className="bg-white p-3 rounded-full text-primary-600 flex-shrink-0 shadow-lg"
+                  >
+                    <Clock size={24} />
+                  </motion.div>
+                  <div className="flex-1">
+                    <div className="text-5xl md:text-6xl font-extrabold leading-none mb-3">
+                      +<AnimatedBenefit end={8} duration={2200} />h
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">libres al mes</h3>
+                    <p className="text-white/80 text-sm opacity-90">Dedícalas a crecer tu negocio.</p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Card 6 - Equipo */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+                className="rounded-xl p-6 bg-white/10 backdrop-blur border border-white/20 hover:-translate-y-2 hover:shadow-lg hover:shadow-primary-200/30 transition-all duration-300 group cursor-pointer"
+                data-gtm="benefit_card_equipo"
+              >
+                <div className="flex items-start gap-4">
+                  <motion.div
+                    whileHover={{ rotate: 10, scale: 1.15 }}
+                    className="bg-white p-3 rounded-full text-primary-600 flex-shrink-0 shadow-lg"
+                  >
+                    <Users size={24} />
+                  </motion.div>
+                  <div className="flex-1">
+                    <div className="text-5xl md:text-6xl font-extrabold leading-none mb-3">
+                      <AnimatedBenefit end={3} duration={1800} /> en 1
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">Un solo equipo</h3>
+                    <p className="text-white/80 text-sm opacity-90">Contabilidad, impuestos y laboral integrados.</p>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* CTA Final brutalista */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              className="text-center mt-16"
+            >
+              <Link to="/cotizador">
+                <motion.button
+                  whileHover={{ y: -3, scale: 1.05 }}
+                  whileActive={{ y: 0, scale: 0.98 }}
+                  className="inline-flex items-center gap-2 px-10 py-5 rounded-full bg-white text-gray-900 font-black text-lg transition-all duration-300 hover:shadow-[6px_6px_0_#000]"
+                  style={{ boxShadow: '4px 4px 0 #000' }}
+                  data-gtm="benefits_cta"
+                  aria-label="Quiero empezar a ganar estos beneficios con Contadoor"
+                >
+                  👉 Quiero empezar a ganar estos beneficios →
+                </motion.button>
+              </Link>
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 1.0 }}
+                className="text-sm text-white/80 mt-4 font-medium"
+              >
+                🔥 Solo quedan 4 cupos para este mes
+              </motion.p>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Comparemos opciones - Optimizado 2025 */}
+      <section className="bg-white py-16 lg:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center"
+          >
+            <div className="inline-flex px-3 py-1 rounded-full bg-primary-50 text-primary-600 text-xs font-semibold ring-1 ring-primary-200 mb-4">
+              COMPARACIÓN HONESTA
+            </div>
+            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mt-2">
+              ¿Cuál opción te conviene <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-400">realmente</span>?
+            </h2>
+            <p className="text-gray-600 mt-3 max-w-2xl mx-auto">
+              Te mostramos la realidad sin filtros para que tomes la mejor decisión para tu negocio.
+            </p>
+          </motion.div>
+
+          {/* Grid de tarjetas diferenciadas - Desktop / Carrusel - Mobile */}
+          <div className="hidden md:grid md:grid-cols-3 gap-6 lg:gap-8 mt-12">
+
+            {/* Card 1 - Contador Independiente (Roja - Problemas) */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="rounded-3xl bg-white border-2 border-red-200 p-8 shadow-lg hover:shadow-red-100 transition-all"
+              data-gtm="compare_card_independiente"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
+                <h3 className="text-2xl font-bold text-gray-900">Contador Independiente</h3>
+              </div>
+              <p className="text-sm text-red-600 font-medium mb-6">Lo tradicional que ya no funciona</p>
+
+              <div className="space-y-4">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: 0.2 }}
+                  className="flex items-start gap-3"
+                >
+                  <span className="text-lg">❌</span>
+                  <span className="text-gray-700 font-medium">Te deja en visto cuando lo necesitas</span>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: 0.3 }}
+                  className="flex items-start gap-3"
+                >
+                  <span className="text-lg">❌</span>
+                  <span className="text-gray-700 font-medium">Se va de vacaciones sin respaldo</span>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: 0.4 }}
+                  className="flex items-start gap-3"
+                >
+                  <span className="text-lg">❌</span>
+                  <span className="text-gray-700 font-medium">Solo reacciona cuando ya hay problemas</span>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: 0.5 }}
+                  className="flex items-start gap-3"
+                >
+                  <span className="text-lg">❌</span>
+                  <span className="text-gray-700 font-medium">Trabajo manual = más errores</span>
+                </motion.div>
+              </div>
+
+              <div className="mt-6 p-3 bg-red-50 rounded-lg border border-red-200">
+                <p className="text-red-700 text-sm font-medium text-center">
+                  ⚠️ Alto riesgo de multas y atrasos
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Card 2 - Software Contable (Amarilla - Advertencia) */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="rounded-3xl bg-white border-2 border-yellow-200 p-8 shadow-lg hover:shadow-yellow-100 transition-all"
+              data-gtm="compare_card_software"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-3 h-3 rounded-full bg-yellow-500 animate-pulse" />
+                <h3 className="text-2xl font-bold text-gray-900">Software Contable</h3>
+              </div>
+              <p className="text-sm text-yellow-600 font-medium mb-6">Tecnología sin el factor humano</p>
+
+              <div className="space-y-4">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: 0.3 }}
+                  className="flex items-start gap-3"
+                >
+                  <span className="text-lg">⚠️</span>
+                  <span className="text-gray-700 font-medium">Necesitas ser experto para usarlo bien</span>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: 0.4 }}
+                  className="flex items-start gap-3"
+                >
+                  <span className="text-lg">❌</span>
+                  <span className="text-gray-700 font-medium">Cero asesoría cuando tienes dudas</span>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: 0.5 }}
+                  className="flex items-start gap-3"
+                >
+                  <span className="text-lg">❌</span>
+                  <span className="text-gray-700 font-medium">Si te equivocas, el problema es tuyo</span>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: 0.6 }}
+                  className="flex items-start gap-3"
+                >
+                  <span className="text-lg">⚠️</span>
+                  <span className="text-gray-700 font-medium">Soporte técnico básico y lento</span>
+                </motion.div>
+              </div>
+
+              <div className="mt-6 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                <p className="text-yellow-700 text-sm font-medium text-center">
+                  ⚠️ Responsabilidad 100% tuya
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Card 3 - Contadoor (Morada - Destacada y más grande) */}
+            <motion.div
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3, type: "spring", damping: 20 }}
+              className="relative rounded-3xl bg-gradient-to-br from-primary-600 to-primary-700 text-white p-8 shadow-2xl ring-2 ring-primary-300 md:transform md:scale-105"
+              data-gtm="compare_card_contadoor"
+            >
+              {/* Badge RECOMENDADO animado con pulse */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.5, type: "spring", damping: 15 }}
+                className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-white text-primary-600 text-sm font-black shadow-lg animate-pulse"
+              >
+                ✨ RECOMENDADO ✨
+              </motion.div>
+
+              <div className="flex items-center gap-3 mb-4 mt-2">
+                <div className="w-3 h-3 rounded-full bg-green-400 animate-pulse" />
+                <h3 className="text-2xl font-bold">Contadoor</h3>
+              </div>
+              <p className="text-sm text-white/90 font-medium mb-6">La solución que sí funciona</p>
+
+              <div className="space-y-4">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: 0.4 }}
+                  className="flex items-start gap-3"
+                >
+                  <span className="text-lg">✅</span>
+                  <span className="text-white font-medium">Equipo completo siempre disponible</span>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: 0.5 }}
+                  className="flex items-start gap-3"
+                >
+                  <span className="text-lg">✅</span>
+                  <span className="text-white font-medium">Tecnología + asesoría humana</span>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: 0.6 }}
+                  className="flex items-start gap-3"
+                >
+                  <span className="text-lg">✅</span>
+                  <span className="text-white font-medium">Prevención antes que los problemas</span>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: 0.7 }}
+                  className="flex items-start gap-3"
+                >
+                  <span className="text-lg">✅</span>
+                  <span className="text-white font-medium">Garantía total de cumplimiento</span>
+                </motion.div>
+              </div>
+
+              <div className="mt-6 p-4 bg-white/10 backdrop-blur rounded-lg border border-white/20">
+                <p className="text-white font-bold text-center">
+                  🏆 Tranquilidad garantizada al 100%
+                </p>
+              </div>
+
+              {/* Botón brutalista mejorado */}
+              <Link to="/cotizador">
+                <motion.button
+                  whileHover={{ y: -2, scale: 1.02 }}
+                  whileActive={{ y: 0, scale: 0.98 }}
+                  className="w-full inline-flex items-center justify-center px-6 py-4 rounded-xl bg-white text-primary-600 font-black text-lg mt-8 transition-all focus:outline-none focus:ring-2 focus:ring-white/20 hover:shadow-[6px_6px_0_#000]"
+                  style={{ boxShadow: '4px 4px 0 #000' }}
+                  data-gtm="compare_cta_contadoor"
+                  aria-label="Elegir Contadoor como mi solución contable"
+                >
+                  👉 Tranquilidad ahora →
+                </motion.button>
+              </Link>
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.8 }}
+                className="text-white/80 text-sm text-center mt-3"
+              >
+                ⚡ Últimos cupos del mes
+              </motion.p>
+            </motion.div>
+          </div>
+
+          {/* Carrusel móvil */}
+          <div className="md:hidden mt-12">
+            <div className="flex overflow-x-auto gap-4 px-4 pb-4 snap-x snap-mandatory scrollbar-hide">
+
+              {/* Card Mobile 1 - Contador Independiente */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="flex-shrink-0 w-80 rounded-3xl bg-white border-2 border-red-200 p-6 shadow-lg snap-center"
+                data-gtm="compare_card_independiente"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
+                  <h3 className="text-xl font-bold text-gray-900">Contador Independiente</h3>
+                </div>
+                <p className="text-sm text-red-600 font-medium mb-4">Lo tradicional que ya no funciona</p>
+
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <span className="text-lg">❌</span>
+                    <span className="text-gray-700 font-medium text-sm">Te deja en visto cuando lo necesitas</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-lg">❌</span>
+                    <span className="text-gray-700 font-medium text-sm">Se va de vacaciones sin respaldo</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-lg">❌</span>
+                    <span className="text-gray-700 font-medium text-sm">Solo reacciona cuando ya hay problemas</span>
+                  </div>
+                </div>
+
+                <div className="mt-4 p-3 bg-red-50 rounded-lg border border-red-200">
+                  <p className="text-red-700 text-sm font-medium text-center">
+                    ⚠️ Alto riesgo de multas
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Card Mobile 2 - Software Contable */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="flex-shrink-0 w-80 rounded-3xl bg-white border-2 border-yellow-200 p-6 shadow-lg snap-center"
+                data-gtm="compare_card_software"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-3 h-3 rounded-full bg-yellow-500 animate-pulse" />
+                  <h3 className="text-xl font-bold text-gray-900">Software Contable</h3>
+                </div>
+                <p className="text-sm text-yellow-600 font-medium mb-4">Tecnología sin el factor humano</p>
+
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <span className="text-lg">⚠️</span>
+                    <span className="text-gray-700 font-medium text-sm">Necesitas ser experto para usarlo</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-lg">❌</span>
+                    <span className="text-gray-700 font-medium text-sm">Cero asesoría cuando tienes dudas</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-lg">❌</span>
+                    <span className="text-gray-700 font-medium text-sm">Si te equivocas, el problema es tuyo</span>
+                  </div>
+                </div>
+
+                <div className="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                  <p className="text-yellow-700 text-sm font-medium text-center">
+                    ⚠️ Responsabilidad 100% tuya
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Card Mobile 3 - Contadoor (Destacada) */}
+              <motion.div
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.3, type: "spring", damping: 20 }}
+                className="relative flex-shrink-0 w-80 rounded-3xl bg-gradient-to-br from-primary-600 to-primary-700 text-white p-6 shadow-2xl ring-2 ring-primary-300 snap-center"
+                data-gtm="compare_card_contadoor"
+              >
+                {/* Badge RECOMENDADO */}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-white text-primary-600 text-xs font-black shadow-lg animate-pulse">
+                  ✨ RECOMENDADO ✨
+                </div>
+
+                <div className="flex items-center gap-3 mb-4 mt-2">
+                  <div className="w-3 h-3 rounded-full bg-green-400 animate-pulse" />
+                  <h3 className="text-xl font-bold">Contadoor</h3>
+                </div>
+                <p className="text-sm text-white/90 font-medium mb-4">La solución que sí funciona</p>
+
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <span className="text-lg">✅</span>
+                    <span className="text-white font-medium text-sm">Equipo completo siempre disponible</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-lg">✅</span>
+                    <span className="text-white font-medium text-sm">Tecnología + asesoría humana</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-lg">✅</span>
+                    <span className="text-white font-medium text-sm">Prevención antes que problemas</span>
+                  </div>
+                </div>
+
+                <div className="mt-4 p-3 bg-white/10 backdrop-blur rounded-lg border border-white/20">
+                  <p className="text-white font-bold text-center text-sm">
+                    🏆 Tranquilidad garantizada al 100%
+                  </p>
+                </div>
+
+                {/* Botón móvil */}
+                <Link to="/cotizador">
+                  <motion.button
+                    whileHover={{ y: -1, scale: 1.02 }}
+                    whileActive={{ y: 0, scale: 0.98 }}
+                    className="w-full inline-flex items-center justify-center px-4 py-3 rounded-xl bg-white text-primary-600 font-black text-base mt-6 transition-all focus:outline-none hover:shadow-[4px_4px_0_#000]"
+                    style={{ boxShadow: '2px 2px 0 #000' }}
+                    data-gtm="compare_cta_contadoor"
+                  >
+                    👉 Tranquilidad ahora →
+                  </motion.button>
+                </Link>
+                <p className="text-white/80 text-xs text-center mt-2">
+                  ⚡ Últimos cupos del mes
+                </p>
+              </motion.div>
+            </div>
+
+            {/* Indicador de scroll */}
+            <div className="flex justify-center mt-4 gap-2">
+              <div className="w-2 h-2 rounded-full bg-gray-300" />
+              <div className="w-2 h-2 rounded-full bg-gray-300" />
+              <div className="w-6 h-2 rounded-full bg-primary-600" />
+            </div>
+          </div>
+
+          {/* Bloque inferior claim optimizado */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mt-16 rounded-3xl bg-gradient-to-r from-primary-50 to-white p-8 md:p-12 text-center border border-primary-100"
+          >
+            <h4 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+              La diferencia está en los <span className="text-primary-600">resultados reales</span>
+            </h4>
+            <p className="text-gray-700 text-lg max-w-4xl mx-auto mb-6">
+              Con Contadoor no solo cumples obligaciones. <span className="font-semibold text-primary-600">Optimizas tu negocio</span> con información clara, prevención proactiva y un equipo que realmente se preocupa por tu éxito.
+            </p>
+            <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-600">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-green-500 rounded-full" />
+                <span>0 multas en 3 años</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-green-500 rounded-full" />
+                <span>Respuesta en 15 minutos</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-green-500 rounded-full" />
+                <span>98% nos recomienda</span>
               </div>
             </div>
-            
-            <h2 className="text-5xl md:text-6xl font-black mb-6">
-              Deja de preocuparte por tus 
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-primary-200">obligaciones</span>
-            </h2>
-            <p className="text-xl mb-10 text-white/90 max-w-2xl mx-auto">
-              Con Contadoor, tu negocio estará siempre al día, con la seguridad y tranquilidad que mereces.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button to="/contacto" className="!bg-primary-600 !text-white hover:!bg-primary-700 transition-transform duration-200 hover:scale-105 active:scale-95">
-                  <span className="font-bold">Hablar con asesor →</span>
-                </Button>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button to="/cotizador" className="bg-transparent text-white border-2 border-white hover:bg-white hover:text-black">
-                  Cotizar en línea
-                </Button>
-              </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* FAQ - Preguntas Frecuentes */}
+      <LazySection fallback={<div className="h-[600px] bg-gray-50 animate-pulse rounded-lg mx-4" />}>
+        <section className="py-16 lg:py-24 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex px-3 py-1 rounded-full bg-primary-50 text-primary-600 text-xs font-semibold ring-1 ring-primary-200 mb-4">
+              ❓ PREGUNTAS FRECUENTES
             </div>
-            
-            <div className="mt-12 pt-8 border-t border-white/20">
-              <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-                <div>
-                  <div className="text-3xl font-black text-primary-400">98%</div>
-                  <div className="text-sm text-white/70">Satisfacción</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-black text-primary-400">24hrs</div>
-                  <div className="text-sm text-white/70">Respuesta</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-black text-primary-400">0</div>
-                  <div className="text-sm text-white/70">Multas SII</div>
+            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-4">
+              Resolvemos tus <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-400">dudas más comunes</span>
+            </h2>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              Más de 500 empresas han hecho estas mismas preguntas. Aquí tienes las respuestas claras.
+            </p>
+
+            {/* Badge de urgencia adicional */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3, type: "spring" }}
+              className="mt-6 inline-flex items-center gap-2 bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-2 rounded-full text-sm font-semibold"
+            >
+              ⏰ Diagnóstico gratuito solo hasta fin de mes
+            </motion.div>
+          </motion.div>
+
+          {/* FAQ Items */}
+          <div className="space-y-4">
+            {faqData.map((faq, index) => (
+              <FAQItem
+                key={index}
+                question={faq.question}
+                answer={faq.answer}
+                isOpen={openFAQ === index}
+                onToggle={() => toggleFAQ(index)}
+              />
+            ))}
+          </div>
+
+          {/* CTA final con urgencia */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-center mt-16"
+          >
+            <div className="bg-gradient-to-r from-primary-50 to-white p-8 rounded-2xl border border-primary-100">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                ¿Tienes otra pregunta? Hablemos directamente
+              </h3>
+              <p className="text-gray-600 mb-6 max-w-xl mx-auto">
+                Agenda una llamada de 15 minutos y te respondemos todo. Sin compromiso, sin costo.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <Link to="/cotizador">
+                  <motion.button
+                    whileHover={{ y: -3, scale: 1.05 }}
+                    whileActive={{ y: 0, scale: 0.98 }}
+                    className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary-600 text-white font-black text-lg transition-all duration-300 hover:shadow-[6px_6px_0_#000]"
+                    style={{ boxShadow: '4px 4px 0 #000' }}
+                    data-gtm="faq_cta_primary"
+                    aria-label="Agendar llamada gratuita para resolver dudas"
+                  >
+                    📞 Agendar llamada gratuita →
+                  </motion.button>
+                </Link>
+
+                <div className="text-center">
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: 0.6 }}
+                    className="text-sm text-gray-600 font-medium"
+                  >
+                    Solo quedan <span className="font-bold text-red-600">5 cupos</span> esta semana
+                  </motion.p>
+                  <p className="text-xs text-gray-500 mt-1">Sin costo, sin compromiso</p>
                 </div>
               </div>
             </div>
           </motion.div>
-        </Container>
+        </div>
+        </section>
+      </LazySection>
+
+      {/* CTA Final - Último empujón para conversión */}
+      <section className="py-20 lg:py-28 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 text-white relative overflow-hidden">
+        {/* Background decorativo */}
+        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-5"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div className="absolute bottom-0 left-0 w-72 h-72 bg-primary-400/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center">
+            {/* Badge de urgencia máxima */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, type: "spring" }}
+              className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-full text-sm font-black mb-8 shadow-lg"
+            >
+              🚨 ATENCIÓN: Solo quedan 3 cupos para este mes
+            </motion.div>
+
+            {/* Headline final potente */}
+            <motion.h2
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-4xl md:text-6xl font-extrabold leading-tight mb-6"
+            >
+              ¿Listo para dormir tranquilo sabiendo que
+              <span className="block text-primary-200">todo está en orden?</span>
+            </motion.h2>
+
+            {/* Subheadline emocional */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="text-xl md:text-2xl text-white/90 max-w-4xl mx-auto mb-12 leading-relaxed"
+            >
+              Únete a las <strong>500+ empresas</strong> que ya transformaron su contabilidad.
+              Sin estrés, sin multas, sin sorpresas. Solo resultados.
+            </motion.p>
+
+            {/* Stats de impacto */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16"
+            >
+              <div className="text-center">
+                <div className="text-4xl md:text-5xl font-extrabold text-white mb-2">
+                  <AnimatedBenefit end={500} suffix="+" duration={2500} />
+                </div>
+                <p className="text-white/80">Empresas confían en nosotros</p>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl md:text-5xl font-extrabold text-white mb-2">
+                  <AnimatedBenefit end={0} duration={2000} />
+                </div>
+                <p className="text-white/80">Multas SII en 3 años</p>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl md:text-5xl font-extrabold text-white mb-2">
+                  <AnimatedBenefit end={98} suffix="%" duration={2200} />
+                </div>
+                <p className="text-white/80">Nos recomienda</p>
+              </div>
+            </motion.div>
+
+            {/* CTAs finales potentes */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12"
+            >
+              <Link to="/cotizador">
+                <motion.button
+                  whileHover={{ y: -4, scale: 1.05 }}
+                  whileActive={{ y: 0, scale: 0.98 }}
+                  className="inline-flex items-center gap-3 px-10 py-6 rounded-2xl bg-white text-primary-600 font-black text-lg transition-all duration-300 hover:shadow-[8px_8px_0_#000] relative group"
+                  style={{ boxShadow: '6px 6px 0 #000' }}
+                  data-gtm="final_cta_primary"
+                >
+                  <span className="text-2xl">🚀</span>
+                  Empezar ahora - Cotiza GRATIS
+                  <motion.span
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                    className="text-xl"
+                  >
+                    →
+                  </motion.span>
+                </motion.button>
+              </Link>
+
+              <Link to="/contacto">
+                <motion.button
+                  whileHover={{ y: -2, scale: 1.02 }}
+                  whileActive={{ y: 0, scale: 0.98 }}
+                  className="inline-flex items-center gap-2 px-10 py-6 rounded-xl border-2 border-white text-white font-bold text-lg hover:bg-white hover:text-primary-600 transition-all duration-300"
+                  data-gtm="final_cta_secondary"
+                >
+                  <CalendarDays size={20} />
+                  Hablar con asesor
+                </motion.button>
+              </Link>
+            </motion.div>
+
+            {/* Garantía y urgencia final */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+              className="space-y-3"
+            >
+              <div className="flex items-center justify-center gap-2 text-primary-200">
+                <span className="text-lg">🛡️</span>
+                <span className="font-semibold">Garantía de 60 días o te devolvemos el dinero</span>
+              </div>
+              <p className="text-white/70 text-sm">
+                ⏰ <strong className="text-primary-200">Solo 8 cupos disponibles</strong> este mes
+              </p>
+              <p className="text-white/60 text-xs">
+                Sin compromisos a largo plazo • Cancela cuando quieras • Soporte 24/7
+              </p>
+            </motion.div>
+          </div>
+        </div>
       </section>
+
     </>
   );
 }

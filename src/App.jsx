@@ -12,6 +12,9 @@ import ComoFunciona from './pages/ComoFunciona';
 import PorQueContadoor from './pages/PorQueContadoor';
 import SobreNosotros from './pages/SobreNosotros';
 import Recursos from './pages/Recursos';
+import Blog from './pages/Blog';
+import Privacidad from './pages/Privacidad';
+import Terminos from './pages/Terminos';
 
 function PreviewWrapper({ children }) {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
@@ -107,6 +110,9 @@ function App() {
               <Route path="/por-que-contadoor" element={<PorQueContadoor />} />
               <Route path="/sobre-nosotros" element={<SobreNosotros />} />
               <Route path="/recursos" element={<Recursos />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/privacidad" element={<Privacidad />} />
+              <Route path="/terminos" element={<Terminos />} />
             </Routes>
           </main>
           <Footer />

@@ -11,18 +11,18 @@ export default function Header() {
     { name: 'Servicios', href: '/servicios' },
     { name: 'Cómo Funciona', href: '/como-funciona' },
     { name: 'Por qué Contadoor', href: '/por-que-contadoor' },
-    { name: 'Recursos', href: '/recursos' },
-    { name: 'Sobre Nosotros', href: '/sobre-nosotros' },
+    { name: 'Nosotros', href: '/sobre-nosotros' },
+    { name: 'Blog', href: '/blog' },
     { name: 'Cotizador', href: '/cotizador' },
   ];
 
   return (
     <header className="sticky top-0 z-50 bg-white text-gray-900 shadow-md">
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-24 md:h-28 items-center justify-between">
+        <div className="flex h-16 md:h-18 items-center justify-between">
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <img src="/logooficial.png" alt="Contadoor" className="h-16 md:h-20 w-auto object-contain" />
+              <img src="/logooficial.png" alt="Contadoor" className="h-10 md:h-12 w-auto object-contain" />
             </Link>
           </div>
           
@@ -45,9 +45,9 @@ export default function Header() {
               <Link
                 to="/contacto"
                 className="ml-4 bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:bg-primary/90 hover:scale-105 active:scale-95 hover:shadow-lg"
-                onClick={() => trackCTAClick('Hablar con asesor', 'header_cta', 'header_navigation', '/contacto')}
+                onClick={() => trackCTAClick('Contactar', 'header_cta', 'header_navigation', '/contacto')}
               >
-                Hablar con asesor
+                Contactar
               </Link>
             </div>
           </div>
@@ -93,11 +93,11 @@ export default function Header() {
                 to="/contacto"
                 className="block bg-primary text-white px-4 py-2 rounded-lg text-base font-semibold transition-all duration-200 hover:bg-primary/90 hover:scale-105 active:scale-95 hover:shadow-lg mt-4"
                 onClick={() => {
-                  trackCTAClick('Hablar con asesor', 'mobile_cta', 'mobile_navigation', '/contacto');
+                  trackCTAClick('Contactar', 'mobile_cta', 'mobile_navigation', '/contacto');
                   setMobileMenuOpen(false);
                 }}
               >
-                Hablar con asesor
+                Contactar
               </Link>
             </div>
           </div>

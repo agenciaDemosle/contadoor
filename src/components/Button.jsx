@@ -1,18 +1,19 @@
 import { Link } from 'react-router-dom';
 import { trackButtonClick, trackCTAClick, trackExternalLink } from '../lib/gtm';
 
-export default function Button({ 
-  to, 
-  href, 
-  onClick, 
-  children, 
+export default function Button({
+  to,
+  href,
+  onClick,
+  children,
   variant = 'primary',
   className = '',
   type = 'button',
   disabled = false,
   trackingName = null,
   trackingSection = 'unknown',
-  trackingPosition = null
+  trackingPosition = null,
+  ...props
 }) {
   const baseClasses = 'inline-block px-6 py-3 rounded-button font-semibold transition-all duration-240';
   
@@ -44,10 +45,11 @@ export default function Button({
 
   if (to) {
     return (
-      <Link 
-        to={to} 
+      <Link
+        to={to}
         className={classes}
         onClick={handleTracking}
+        {...props}
       >
         {children}
       </Link>
@@ -56,12 +58,13 @@ export default function Button({
 
   if (href) {
     return (
-      <a 
-        href={href} 
-        className={classes} 
-        target="_blank" 
+      <a
+        href={href}
+        className={classes}
+        target="_blank"
         rel="noopener noreferrer"
         onClick={handleTracking}
+        {...props}
       >
         {children}
       </a>
@@ -69,7 +72,7 @@ export default function Button({
   }
 
   return (
-    <button 
+    <button
       type={type}
       onClick={(e) => {
         handleTracking();
@@ -77,6 +80,7 @@ export default function Button({
       }}
       className={classes}
       disabled={disabled}
+      {...props}
     >
       {children}
     </button>

@@ -8,10 +8,10 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-bold mb-4">Servicios</h3>
             <ul className="space-y-2">
-              <li><Link to="/servicios/contabilidad-finanzas" className="hover:underline">Contabilidad y Finanzas</Link></li>
-              <li><Link to="/servicios/impuestos" className="hover:underline">Impuestos</Link></li>
-              <li><Link to="/servicios/gestion-laboral" className="hover:underline">Gestión Laboral</Link></li>
-              <li><Link to="/servicios/asesoria-estrategica" className="hover:underline">Asesoría Estratégica</Link></li>
+              <li><span className="text-white/80">Contabilidad y Finanzas</span></li>
+              <li><span className="text-white/80">Impuestos</span></li>
+              <li><span className="text-white/80">Gestión Laboral</span></li>
+              <li><span className="text-white/80">Asesoría Estratégica</span></li>
             </ul>
           </div>
           
@@ -21,7 +21,6 @@ export default function Footer() {
               <li><Link to="/sobre-nosotros" className="hover:underline">Sobre Nosotros</Link></li>
               <li><Link to="/como-funciona" className="hover:underline">Cómo Funciona</Link></li>
               <li><Link to="/por-que-contadoor" className="hover:underline">Por qué Contadoor</Link></li>
-              <li><Link to="/casos" className="hover:underline">Casos de Éxito</Link></li>
             </ul>
           </div>
           
@@ -36,8 +35,8 @@ export default function Footer() {
           
           <div>
             <h3 className="text-lg font-bold mb-4">Contacto</h3>
-            <p className="mb-2">contacto@contadoor.cl</p>
-            <p className="mb-4">+56 2 2345 6789</p>
+            <p className="mb-2">info@contadoor.cl</p>
+            <p className="mb-4">+56979881891</p>
             <Link
               to="/contacto"
               className="inline-block !bg-primary-600 !text-white px-6 py-3 rounded-button font-semibold transition-transform duration-200 hover:!bg-primary-700 hover:scale-105 active:scale-95 hover:shadow-lg"
@@ -47,18 +46,21 @@ export default function Footer() {
           </div>
         </div>
         
-        <div className="mt-12 pt-8 border-t border-white/20">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-center md:text-left mb-4 md:mb-0">
-              © 2024 Contadoor. Todos los derechos reservados.
+        <div className="mt-8 pt-6 border-t border-white/20">
+          <div className="flex flex-col lg:flex-row justify-between items-center gap-4 text-sm">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <p className="text-center">
+                © 2024 Contadoor. Todos los derechos reservados.
+              </p>
+              <div className="flex items-center gap-2 text-xs">
+                <Link to="/privacidad" className="hover:underline">Política de Privacidad</Link>
+                <span>•</span>
+                <Link to="/terminos" className="hover:underline">Términos y Condiciones</Link>
+              </div>
+            </div>
+            <p className="text-center font-semibold flex items-center text-sm">
+              Creado con <span className="text-red-500 mx-1">♥</span> por <a href="https://demosle.cl" target="_blank" rel="noopener noreferrer" className="hover:underline ml-1">Demosle</a>
             </p>
-            <p className="text-center md:text-right font-semibold">
-              Somos la puerta a tu solución
-            </p>
-          </div>
-          <div className="mt-4 flex justify-center md:justify-start space-x-4 text-sm">
-            <Link to="/privacidad" className="hover:underline">Política de Privacidad</Link>
-            <Link to="/terminos" className="hover:underline">Términos y Condiciones</Link>
           </div>
         </div>
       </div>

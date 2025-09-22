@@ -1,10 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Container from '../components/Container';
 import Button from '../components/Button';
+import { trackPageView } from '../lib/gtm';
 
 export default function Recursos() {
   const [filtro, setFiltro] = useState('todos');
+
+  // Track page load
+  useEffect(() => {
+    trackPageView('Recursos', '/recursos');
+  }, []);
 
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },

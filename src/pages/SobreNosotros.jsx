@@ -1,10 +1,62 @@
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
 import Container from '../components/Container';
 import Section from '../components/Section';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import { trackPageView } from '../lib/gtm';
+
+// Componente contador animado
+function AnimatedCounter({ end, duration = 2000, suffix = '', prefix = '' }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+
+  useEffect(() => {
+    if (!isInView) return;
+
+    let startTime;
+    let animationFrame;
+
+    const animate = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+
+      // Usar una función de easing para suavizar la animación
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+      const currentCount = Math.floor(easeOutQuart * end);
+
+      setCount(currentCount);
+
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(animate);
+      } else {
+        setCount(end);
+      }
+    };
+
+    animationFrame = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+    };
+  }, [end, duration, isInView]);
+
+  return (
+    <span ref={ref}>
+      {prefix}{count}{suffix}
+    </span>
+  );
+}
 
 export default function SobreNosotros() {
+  // Track page load
+  useEffect(() => {
+    trackPageView('Sobre Nosotros', '/sobre-nosotros');
+  }, []);
+
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
@@ -50,28 +102,6 @@ export default function SobreNosotros() {
     }
   ];
 
-  const equipo = [
-    {
-      nombre: 'Luciano Duarte',
-      cargo: 'Fundador y Director General',
-      descripcion: 'Liderando con visión y cercanía desde 2015'
-    },
-    {
-      nombre: 'Carolina Méndez',
-      cargo: 'Directora de Operaciones',
-      descripcion: 'Garantizando excelencia en cada proceso'
-    },
-    {
-      nombre: 'Roberto Fuentes',
-      cargo: 'Director Tributario',
-      descripcion: 'Experto en optimización y cumplimiento fiscal'
-    },
-    {
-      nombre: 'Andrea Vásquez',
-      cargo: 'Directora de Clientes',
-      descripcion: 'Tu voz dentro de Contadoor'
-    }
-  ];
 
   return (
     <>
@@ -187,15 +217,21 @@ export default function SobreNosotros() {
             className="mb-20"
           >
             <h2 className="text-3xl font-bold mb-12 text-center">Conoce al equipo</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {equipo.map((miembro, index) => (
-                <div key={index} className="text-center">
-                  <div className="w-32 h-32 bg-gray-200 rounded-full mx-auto mb-4" />
-                  <h3 className="text-lg font-bold">{miembro.nombre}</h3>
-                  <p className="text-primary font-medium mb-2">{miembro.cargo}</p>
-                  <p className="text-sm text-gray-600">{miembro.descripcion}</p>
-                </div>
-              ))}
+            <div className="max-w-4xl mx-auto">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl transform rotate-2 scale-105 opacity-20" />
+                <img
+                  src="/contadores.jpg"
+                  alt="Equipo Contadoor"
+                  className="w-full rounded-2xl shadow-xl relative z-10"
+                />
+              </div>
+              <div className="mt-8 text-center">
+                <p className="text-lg text-gray-700 leading-relaxed max-w-2xl mx-auto">
+                  Un equipo comprometido con tu éxito. Profesionales expertos que trabajan día a día
+                  para que tengas la tranquilidad de saber que todo está en orden.
+                </p>
+              </div>
             </div>
           </motion.div>
 
@@ -211,22 +247,50 @@ export default function SobreNosotros() {
             <div className="bg-primary text-white rounded-card p-12">
               <h2 className="text-3xl font-bold mb-12 text-center">Números que hablan</h2>
               <div className="grid md:grid-cols-4 gap-8 text-center">
-                <div>
-                  <div className="text-5xl font-black mb-2">500+</div>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.1 }}
+                >
+                  <div className="text-5xl font-black mb-2">
+                    <AnimatedCounter end={500} duration={2500} suffix="+" />
+                  </div>
                   <p className="opacity-90">Empresas confían en nosotros</p>
-                </div>
-                <div>
-                  <div className="text-5xl font-black mb-2">0</div>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                  <div className="text-5xl font-black mb-2">
+                    <AnimatedCounter end={0} duration={1500} />
+                  </div>
                   <p className="opacity-90">Multas SII en 3 años</p>
-                </div>
-                <div>
-                  <div className="text-5xl font-black mb-2">15min</div>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                >
+                  <div className="text-5xl font-black mb-2">
+                    <AnimatedCounter end={15} duration={2000} suffix="min" />
+                  </div>
                   <p className="opacity-90">Tiempo promedio de respuesta</p>
-                </div>
-                <div>
-                  <div className="text-5xl font-black mb-2">98%</div>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                >
+                  <div className="text-5xl font-black mb-2">
+                    <AnimatedCounter end={98} duration={2200} suffix="%" />
+                  </div>
                   <p className="opacity-90">Clientes nos recomiendan</p>
-                </div>
+                </motion.div>
               </div>
             </div>
           </motion.div>
