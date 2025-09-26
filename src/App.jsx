@@ -15,6 +15,7 @@ import Recursos from './pages/Recursos';
 import Blog from './pages/Blog';
 import Privacidad from './pages/Privacidad';
 import Terminos from './pages/Terminos';
+import PrimeraAsesoria from './pages/PrimeraAsesoria';
 
 function PreviewWrapper({ children }) {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
@@ -113,6 +114,7 @@ function App() {
               <Route path="/blog" element={<Blog />} />
               <Route path="/privacidad" element={<Privacidad />} />
               <Route path="/terminos" element={<Terminos />} />
+              <Route path="/primera-asesoria" element={<PrimeraAsesoria />} />
             </Routes>
           </main>
           <Footer />
