@@ -1,11 +1,26 @@
 import { motion } from 'framer-motion';
+import logoColor from '../../assets/logo color.png';
 
 const Hero = () => {
   return (
     <section className="relative bg-white pt-12 pb-20 overflow-hidden">
       <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-32 md:w-64 h-32 md:h-64 bg-primary/10 rounded-full blur-2xl" />
-      
+
+      {/* Logo en la esquina superior */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="absolute top-6 left-6 z-10"
+      >
+        <img
+          src={logoColor}
+          alt="Contadoor Logo"
+          className="h-8 md:h-10 w-auto object-contain"
+        />
+      </motion.div>
+
       <div className="container mx-auto px-4 relative">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <motion.div 
