@@ -39,7 +39,7 @@ const FAQs = () => {
         {[...Array(5)].map((_, i) => (
           <motion.div
             key={`bg-${i}`}
-            className="absolute w-64 h-64 bg-brand-primary/5 rounded-full blur-3xl"
+            className="absolute w-64 h-64 bg-primary/5 rounded-full blur-3xl"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`
@@ -72,17 +72,17 @@ const FAQs = () => {
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
               whileHover={{ scale: 1.05 }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-primary/10 rounded-full mb-4 backdrop-blur"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full mb-4 backdrop-blur"
             >
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
               >
-                <Sparkles className="w-5 h-5 text-brand-primary" />
+                <Sparkles className="w-5 h-5 text-primary" />
               </motion.div>
-              <span className="font-medium text-brand-dark">Preguntas Frecuentes</span>
+              <span className="font-medium text-black">Preguntas Frecuentes</span>
             </motion.div>
-            <h2 className="text-2xl md:text-3xl font-display font-bold text-brand-dark mb-4">
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-black mb-4">
               Resolvemos tus dudas
             </h2>
             <p className="text-gray-600 text-base md:text-lg">
@@ -106,7 +106,7 @@ const FAQs = () => {
                   scale: 1.02,
                   transition: { duration: 0.5 }
                 }}
-                className="bg-brand-primary rounded-xl shadow-lg overflow-hidden group"
+                className="bg-primary rounded-xl shadow-lg overflow-hidden group"
                 style={{
                   boxShadow: openIndex === index 
                     ? "0 20px 40px rgba(160, 86, 153, 0.3)" 

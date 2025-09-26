@@ -39,12 +39,12 @@ const Cases = () => {
           className="max-w-5xl mx-auto"
         >
           <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-display font-bold text-brand-dark mb-4">
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-black mb-4">
               Casos de Éxito
             </h2>
             <p className="text-gray-600">
               Transformaciones reales con el{' '}
-              <span className="inline-block bg-brand-primary text-white px-2 py-0.5 rounded text-sm">
+              <span className="inline-block bg-primary text-white px-2 py-0.5 rounded text-sm">
                 Modelo Contadoor
               </span>
             </p>
@@ -68,11 +68,11 @@ const Cases = () => {
                   <motion.div 
                     whileHover={{ rotate: 360 }}
                     transition={{ duration: 0.5 }}
-                    className="w-10 h-10 bg-brand-primary/10 rounded-full flex items-center justify-center group-hover:bg-brand-primary group-hover:text-white transition-all duration-300"
+                    className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300"
                   >
-                    <caseItem.icon className="w-5 h-5 text-brand-primary group-hover:text-white transition-colors" />
+                    <caseItem.icon className="w-5 h-5 text-primary group-hover:text-white transition-colors" />
                   </motion.div>
-                  <h3 className="font-semibold text-brand-dark">
+                  <h3 className="font-semibold text-black">
                     {caseItem.company}
                   </h3>
                 </div>
@@ -88,9 +88,9 @@ const Cases = () => {
                     <p className="text-sm text-gray-700">{caseItem.after}</p>
                   </div>
 
-                  <div className="p-3 bg-brand-primary/10 rounded-lg">
-                    <p className="text-xs font-medium text-brand-primary mb-1">Resultado</p>
-                    <p className="text-sm font-semibold text-brand-dark">{caseItem.result}</p>
+                  <div className="p-3 bg-primary/10 rounded-lg">
+                    <p className="text-xs font-medium text-primary mb-1">Resultado</p>
+                    <p className="text-sm font-semibold text-black">{caseItem.result}</p>
                   </div>
                 </div>
               </motion.div>

@@ -162,7 +162,7 @@ const Quiz = () => {
   const result = showResults ? getResultMessage() : null;
 
   return (
-    <section id="quiz" className="py-16 bg-gradient-to-br from-brand-primary/5 to-white">
+    <section id="quiz" className="py-16 bg-gradient-to-br from-primary/5 to-white">
       <div className="container mx-auto px-4">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -171,7 +171,7 @@ const Quiz = () => {
           className="max-w-3xl mx-auto"
         >
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-display font-bold text-brand-dark mb-4">
+            <h2 className="text-3xl font-display font-bold text-black mb-4">
               Quiz de Diagnóstico Rápido
             </h2>
             <p className="text-gray-600">
@@ -193,13 +193,13 @@ const Quiz = () => {
                       <span className="text-sm text-gray-500">
                         Pregunta {currentQuestion + 1} de {questions.length}
                       </span>
-                      <span className="text-sm text-brand-primary font-medium">
+                      <span className="text-sm text-primary font-medium">
                         {Math.round(((currentQuestion + 1) / questions.length) * 100)}% completado
                       </span>
                     </div>
                     <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                       <motion.div 
-                        className="h-full bg-brand-primary"
+                        className="h-full bg-primary"
                         initial={{ width: 0 }}
                         animate={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
                         transition={{ duration: 0.3 }}
@@ -208,7 +208,7 @@ const Quiz = () => {
                   </div>
 
                   <div className="mb-8">
-                    <h3 className="text-xl font-semibold text-brand-dark mb-6">
+                    <h3 className="text-xl font-semibold text-black mb-6">
                       {questions[currentQuestion].question}
                     </h3>
                     
@@ -219,7 +219,7 @@ const Quiz = () => {
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: idx * 0.1 }}
                           key={option.value}
-                          className="flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all hover:border-brand-primary/50"
+                          className="flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all hover:border-primary/50"
                           style={{
                             borderColor: answers[questions[currentQuestion].id] === option.value 
                               ? '#A05699' 
@@ -242,10 +242,10 @@ const Quiz = () => {
                             }}
                           >
                             {answers[questions[currentQuestion].id] === option.value && (
-                              <div className="w-2.5 h-2.5 bg-brand-primary rounded-full" />
+                              <div className="w-2.5 h-2.5 bg-primary rounded-full" />
                             )}
                           </div>
-                          <span className="text-brand-dark">{option.label}</span>
+                          <span className="text-black">{option.label}</span>
                         </motion.label>
                       ))}
                     </div>
@@ -255,7 +255,7 @@ const Quiz = () => {
                     <button
                       onClick={handlePrevious}
                       disabled={currentQuestion === 0}
-                      className="px-6 py-2 text-brand-dark border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="px-6 py-2 text-black border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Anterior
                     </button>
@@ -264,7 +264,7 @@ const Quiz = () => {
                       <button
                         onClick={handleSubmit}
                         disabled={Object.keys(answers).length !== questions.length}
-                        className="px-6 py-2 bg-brand-primary text-white rounded-xl hover:bg-brand-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center gap-2 group"
+                        className="px-6 py-2 bg-primary text-white rounded-xl hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center gap-2 group"
                       >
                         <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         Enviar diagnóstico
@@ -273,7 +273,7 @@ const Quiz = () => {
                       <button
                         onClick={handleNext}
                         disabled={!answers[questions[currentQuestion].id]}
-                        className="px-6 py-2 bg-brand-primary text-white rounded-xl hover:bg-brand-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="px-6 py-2 bg-primary text-white rounded-xl hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         Siguiente
                       </button>
@@ -296,7 +296,7 @@ const Quiz = () => {
                     <result.icon className={`w-10 h-10 ${result.color}`} />
                   </motion.div>
                   
-                  <h3 className="text-2xl font-bold text-brand-dark mb-2">
+                  <h3 className="text-2xl font-bold text-black mb-2">
                     {result.title}
                   </h3>
                   
@@ -304,7 +304,7 @@ const Quiz = () => {
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.3, type: "spring" }}
-                    className="text-4xl font-bold text-brand-primary mb-4"
+                    className="text-4xl font-bold text-primary mb-4"
                   >
                     {score}%
                   </motion.div>
@@ -319,7 +319,7 @@ const Quiz = () => {
                       setCurrentQuestion(0);
                       setAnswers({});
                     }}
-                    className="px-8 py-3 bg-brand-primary text-white rounded-xl hover:bg-brand-primary/90 transition-colors"
+                    className="px-8 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors"
                   >
                     Hacer quiz nuevamente
                   </button>

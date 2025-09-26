@@ -9,7 +9,7 @@ const testimonials = [
     company: 'CEO - TechPro Importaciones',
     text: (
       <>
-        <span className="inline-block bg-brand-primary text-white px-1.5 py-0.5 rounded text-sm">
+        <span className="inline-block bg-primary text-white px-1.5 py-0.5 rounded text-sm">
           Contadoor
         </span>{' '}
         transformó completamente nuestra gestión financiera. Pasamos de tener multas constantes a cero problemas con el SII. El ROI fue evidente desde el tercer mes.
@@ -54,7 +54,7 @@ const Testimonials = () => {
           className="max-w-3xl mx-auto"
         >
           <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-display font-bold text-brand-dark mb-4">
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-black mb-4">
               Lo que dicen nuestros clientes
             </h2>
           </div>
@@ -74,12 +74,12 @@ const Testimonials = () => {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 100, damping: 15 }}
-                    className="w-16 h-16 bg-brand-primary/10 rounded-full flex items-center justify-center flex-shrink-0"
+                    className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0"
                   >
-                    <User className="w-8 h-8 text-brand-primary" />
+                    <User className="w-8 h-8 text-primary" />
                   </motion.div>
                   <div>
-                    <h3 className="font-semibold text-brand-dark">
+                    <h3 className="font-semibold text-black">
                       {testimonials[currentIndex].name}
                     </h3>
                     <p className="text-sm text-gray-600">
@@ -101,11 +101,11 @@ const Testimonials = () => {
                 </div>
 
                 <div className="relative">
-                  <span className="text-6xl text-brand-primary/20 absolute -top-2 -left-2">"</span>
+                  <span className="text-6xl text-primary/20 absolute -top-2 -left-2">"</span>
                   <div className="text-gray-700 italic pl-8">
                     {testimonials[currentIndex].text}
                   </div>
-                  <span className="text-6xl text-brand-primary/20 absolute -bottom-6 right-2 rotate-180">"</span>
+                  <span className="text-6xl text-primary/20 absolute -bottom-6 right-2 rotate-180">"</span>
                 </div>
               </motion.div>
             </AnimatePresence>
@@ -115,7 +115,7 @@ const Testimonials = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={prevTestimonial}
-                className="w-10 h-10 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 hover:border-brand-primary transition-all duration-300"
+                className="w-10 h-10 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 hover:border-primary transition-all duration-300"
                 aria-label="Testimonio anterior"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -127,7 +127,7 @@ const Testimonials = () => {
                     key={index}
                     onClick={() => setCurrentIndex(index)}
                     className={`w-2 h-2 rounded-full transition-colors ${
-                      index === currentIndex ? 'bg-brand-primary' : 'bg-gray-300'
+                      index === currentIndex ? 'bg-primary' : 'bg-gray-300'
                     }`}
                     aria-label={`Ir al testimonio ${index + 1}`}
                   />
@@ -138,7 +138,7 @@ const Testimonials = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={nextTestimonial}
-                className="w-10 h-10 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 hover:border-brand-primary transition-all duration-300"
+                className="w-10 h-10 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 hover:border-primary transition-all duration-300"
                 aria-label="Siguiente testimonio"
               >
                 <ChevronRight className="w-5 h-5" />

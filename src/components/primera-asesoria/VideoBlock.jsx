@@ -140,7 +140,7 @@ const VideoBlock = () => {
                               }}
                               className="w-14 h-14 md:w-16 md:h-16 bg-white/90 backdrop-blur rounded-full flex items-center justify-center"
                             >
-                              <Play className="w-6 h-6 md:w-8 md:h-8 text-brand-primary ml-1" fill="currentColor" />
+                              <Play className="w-6 h-6 md:w-8 md:h-8 text-primary ml-1" fill="currentColor" />
                             </motion.div>
                           </div>
                         )}
@@ -161,10 +161,10 @@ const VideoBlock = () => {
                     <div className="p-3 bg-white">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-semibold text-brand-dark">Luciano - CEO Contadoor</p>
+                          <p className="text-sm font-semibold text-black">Luciano - CEO Contadoor</p>
                           <p className="text-xs text-gray-500">Mensaje de bienvenida</p>
                         </div>
-                        <div className="text-xs text-brand-primary font-medium">
+                        <div className="text-xs text-primary font-medium">
                           3:00 min
                         </div>
                       </div>

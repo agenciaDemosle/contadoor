@@ -15,10 +15,10 @@ const ProgressBar = () => {
             initial={{ width: 0 }}
             animate={{ width: '100%' }}
             transition={{ duration: 1, delay: 0.8 }}
-            className="absolute h-full bg-brand-primary rounded-full"
+            className="absolute h-full bg-primary rounded-full"
           />
         </div>
-        <span className="text-brand-dark text-xs flex items-center gap-1">
+        <span className="text-black text-xs flex items-center gap-1">
           Tu reunión está agendada
           <CheckCircle className="w-3 h-3 text-green-600" />
         </span>

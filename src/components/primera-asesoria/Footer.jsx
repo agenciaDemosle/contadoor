@@ -4,7 +4,7 @@ import logoColor from '../../assets/logo color.png';
 
 const Footer = () => {
   return (
-    <footer className="text-white py-12" style={{ backgroundColor: '#7A4075' }}>
+    <footer className="text-white py-12 bg-primary-700">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8 mb-8">
@@ -63,7 +63,7 @@ const Footer = () => {
                   href="https://instagram.com/contadoor.cl" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-brand-primary transition-colors"
+                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors"
                   aria-label="LinkedIn"
                 >
                 
@@ -75,7 +75,7 @@ const Footer = () => {
                   href="https://facebook.com/contadoor.cl" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-brand-primary transition-colors"
+                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors"
                   aria-label="Facebook"
                 >
                   <Facebook className="w-5 h-5" />

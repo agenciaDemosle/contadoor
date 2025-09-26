@@ -78,7 +78,7 @@ const Resources = () => {
           className="max-w-5xl mx-auto"
         >
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-display font-bold text-brand-dark mb-4">
+            <h2 className="text-3xl font-display font-bold text-black mb-4">
               Biblioteca de Recursos Quick-Win
             </h2>
             <p className="text-gray-600">
@@ -99,11 +99,11 @@ const Resources = () => {
                 <motion.div 
                   whileHover={{ scale: 1.2, rotate: 10 }}
                   transition={{ type: "spring", stiffness: 300 }}
-                  className="w-12 h-12 bg-brand-primary/10 rounded-lg flex items-center justify-center mb-4"
+                  className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4"
                 >
-                  <resource.icon className="w-6 h-6 text-brand-primary" />
+                  <resource.icon className="w-6 h-6 text-primary" />
                 </motion.div>
-                <h3 className="text-lg font-semibold text-brand-dark mb-2">
+                <h3 className="text-lg font-semibold text-black mb-2">
                   {resource.title}
                 </h3>
                 <p className="text-sm text-gray-600 mb-4">
@@ -113,7 +113,7 @@ const Resources = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleDownloadClick(resource)}
-                  className="w-full px-4 py-2 bg-brand-primary text-white rounded-xl hover:bg-brand-primary/90 transition-all duration-300 flex items-center justify-center gap-2 group"
+                  className="w-full px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary/90 transition-all duration-300 flex items-center justify-center gap-2 group"
                 >
                   <Download className="w-4 h-4 group-hover:animate-bounce" />
                   Descargar
@@ -141,7 +141,7 @@ const Resources = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold text-brand-dark">
+                <h3 className="text-xl font-semibold text-black">
                   Descargar recurso
                 </h3>
                 <motion.button
@@ -158,9 +158,9 @@ const Resources = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg mb-4"
               >
-                <FileIcon className="w-5 h-5 text-brand-primary" />
+                <FileIcon className="w-5 h-5 text-primary" />
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-brand-dark">
+                  <p className="text-sm font-medium text-black">
                     {selectedResource?.title}
                   </p>
                   <p className="text-xs text-gray-500">
@@ -171,7 +171,7 @@ const Resources = () => {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-brand-dark mb-1">
+                  <label className="block text-sm font-medium text-black mb-1">
                     RUT Empresa
                   </label>
                   <input
@@ -179,7 +179,7 @@ const Resources = () => {
                     placeholder="12345678-9"
                     value={formData.rut}
                     onChange={(e) => setFormData({ ...formData, rut: e.target.value })}
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
                       errors.rut ? 'border-red-500' : 'border-gray-300'
                     }`}
                   />
@@ -189,7 +189,7 @@ const Resources = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-brand-dark mb-1">
+                  <label className="block text-sm font-medium text-black mb-1">
                     Email
                   </label>
                   <input
@@ -197,7 +197,7 @@ const Resources = () => {
                     placeholder="tu@empresa.cl"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
                       errors.email ? 'border-red-500' : 'border-gray-300'
                     }`}
                   />
@@ -208,7 +208,7 @@ const Resources = () => {
 
                 <button
                   type="submit"
-                  className="w-full px-4 py-2 bg-brand-primary text-white rounded-xl hover:bg-brand-primary/90 transition-colors"
+                  className="w-full px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors"
                 >
                   Descargar ahora
                 </button>

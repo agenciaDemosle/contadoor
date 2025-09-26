@@ -161,10 +161,10 @@ const ScrollFlow = ({ children, sectionName, index, isUnlocked, onView, hasBeenV
                 }}
                 className="flex flex-col items-center"
               >
-                <div className="px-4 py-2 bg-brand-primary text-white rounded-full text-sm font-medium mb-2 shadow-lg">
+                <div className="px-4 py-2 bg-primary text-white rounded-full text-sm font-medium mb-2 shadow-lg">
                   ¡Sección desbloqueada! Continúa bajando
                 </div>
-                <ChevronDown className="w-6 h-6 text-brand-primary" />
+                <ChevronDown className="w-6 h-6 text-primary" />
               </motion.div>
             </motion.div>
           )}
@@ -211,12 +211,12 @@ const ScrollFlow = ({ children, sectionName, index, isUnlocked, onView, hasBeenV
                     strokeLinecap="round"
                   />
                 </svg>
-                <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-brand-primary">
+                <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-primary">
                   {Math.round(viewPercentage)}%
                 </span>
               </div>
               <div>
-                <p className="text-sm font-medium text-brand-dark">
+                <p className="text-sm font-medium text-black">
                   {sectionName}
                 </p>
                 <p className="text-xs text-gray-500">

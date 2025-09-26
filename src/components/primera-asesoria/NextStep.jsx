@@ -9,7 +9,7 @@ const steps = [
 
 const NextStep = () => {
   return (
-    <section className="py-16 bg-brand-primary/10">
+    <section className="py-16 bg-primary/10">
       <div className="container mx-auto px-4">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -18,7 +18,7 @@ const NextStep = () => {
           className="max-w-3xl mx-auto"
         >
           <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-display font-bold text-brand-dark mb-4">
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-black mb-4">
               ¿Qué pasa después?
             </h2>
             <p className="text-gray-600">
@@ -41,11 +41,11 @@ const NextStep = () => {
                   <motion.div 
                     whileHover={{ scale: 1.2, rotate: 360 }}
                     transition={{ duration: 0.3 }}
-                    className="w-6 h-6 bg-brand-primary rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-brand-primary/80 transition-colors"
+                    className="w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-primary/80 transition-colors"
                   >
                     <Check className="w-4 h-4 text-white" />
                   </motion.div>
-                  <p className="text-brand-dark group-hover:text-brand-primary transition-colors duration-300">
+                  <p className="text-black group-hover:text-primary transition-colors duration-300">
                     {step}
                   </p>
                 </motion.div>
@@ -57,9 +57,9 @@ const NextStep = () => {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.4 }}
-              className="mt-8 p-4 bg-brand-primary/5 rounded-xl border border-brand-primary/20"
+              className="mt-8 p-4 bg-primary/5 rounded-xl border border-primary/20"
             >
-              <p className="text-sm text-center text-brand-dark">
+              <p className="text-sm text-center text-black">
                 <span className="font-semibold">Sin letra chica:</span> Si decides que no somos 
                 para ti, nos despedimos como amigos y te llevas todos los recursos gratuitos.
               </p>

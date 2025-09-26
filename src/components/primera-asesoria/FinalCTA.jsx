@@ -28,7 +28,7 @@ const FinalCTA = () => {
             transition={{ 
               boxShadow: { duration: 3, repeat: Infinity }
             }}
-            className="bg-brand-primary rounded-2xl p-8 md:p-12 text-center">
+            className="bg-primary rounded-2xl p-8 md:p-12 text-center">
             <h2 className="text-2xl md:text-3xl font-display font-bold text-white mb-4">
               ¿Listo para transformar tu gestión contable?
             </h2>
@@ -42,7 +42,7 @@ const FinalCTA = () => {
                 whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(255, 255, 255, 0.3)" }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleFormClick}
-                className="px-10 py-4 bg-white text-brand-primary rounded-xl font-medium hover:bg-gray-100 transition-all duration-300 flex items-center justify-center gap-2 group shadow-lg text-base md:text-lg"
+                className="px-10 py-4 bg-white text-primary rounded-xl font-medium hover:bg-gray-100 transition-all duration-300 flex items-center justify-center gap-2 group shadow-lg text-base md:text-lg"
               >
                 Completar formulario ahora
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

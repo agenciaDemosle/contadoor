@@ -35,7 +35,7 @@ const Includes = () => {
           className="max-w-5xl mx-auto"
         >
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-display font-bold text-brand-dark mb-4">
+            <h2 className="text-3xl font-display font-bold text-black mb-4">
               Lo que incluye la reunión
             </h2>
             <p className="text-gray-600">
@@ -56,16 +56,16 @@ const Includes = () => {
                   borderStyle: 'solid',
                   transition: { duration: 0.3 }
                 }}
-                className="bg-white rounded-2xl p-6 text-center border-2 border-dashed border-brand-muted/50 hover:border-solid hover:border-brand-primary/50 transition-all duration-300 group"
+                className="bg-white rounded-2xl p-6 text-center border-2 border-dashed border-neutral/50 hover:border-solid hover:border-primary/50 transition-all duration-300 group"
               >
                 <motion.div 
                   whileHover={{ rotate: [0, -10, 10, -10, 0] }}
                   transition={{ duration: 0.5 }}
-                  className="w-14 h-14 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-brand-primary group-hover:text-white transition-all duration-300"
+                  className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary group-hover:text-white transition-all duration-300"
                 >
-                  <item.icon className="w-7 h-7 text-brand-primary group-hover:text-white transition-colors" />
+                  <item.icon className="w-7 h-7 text-primary group-hover:text-white transition-colors" />
                 </motion.div>
-                <h3 className="font-semibold text-brand-dark mb-2">
+                <h3 className="font-semibold text-black mb-2">
                   {item.title}
                 </h3>
                 <p className="text-sm text-gray-600">

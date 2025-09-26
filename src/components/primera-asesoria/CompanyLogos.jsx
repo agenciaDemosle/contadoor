@@ -95,7 +95,7 @@ const CompanyLogos = () => {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-2xl md:text-3xl font-display font-bold text-brand-dark mb-4">
+          <h2 className="text-2xl md:text-3xl font-display font-bold text-black mb-4">
             Empresas que confían en nosotros
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto px-2">
@@ -241,7 +241,7 @@ const CompanyLogos = () => {
                 repeat: Infinity,
                 repeatDelay: 2
               }}
-              className="text-3xl font-bold text-brand-primary mb-1"
+              className="text-3xl font-bold text-primary mb-1"
             >
               300+
             </motion.div>
@@ -257,7 +257,7 @@ const CompanyLogos = () => {
                 repeat: Infinity,
                 repeatDelay: 3
               }}
-              className="text-3xl font-bold text-brand-primary mb-1"
+              className="text-3xl font-bold text-primary mb-1"
             >
               98%
             </motion.div>
@@ -273,7 +273,7 @@ const CompanyLogos = () => {
                 repeat: Infinity,
                 repeatDelay: 4
               }}
-              className="text-3xl font-bold text-brand-primary mb-1"
+              className="text-3xl font-bold text-primary mb-1"
             >
               15+
             </motion.div>
@@ -289,7 +289,7 @@ const CompanyLogos = () => {
                 repeat: Infinity,
                 repeatDelay: 5
               }}
-              className="text-3xl font-bold text-brand-primary mb-1"
+              className="text-3xl font-bold text-primary mb-1"
             >
               10 años
             </motion.div>

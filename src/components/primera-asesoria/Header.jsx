@@ -11,7 +11,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white sticky top-0 z-50 border-b border-gray-100">
+    <header className="bg-white sticky top-0 z-50 border-b border-primary-100 shadow-soft">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <motion.div 
@@ -35,7 +35,7 @@ const Header = () => {
               whileTap={{ scale: 0.95 }}
               transition={{ delay: 0.3 }}
               onClick={handleFormScroll}
-              className="px-4 py-2 border border-brand-muted text-brand-dark rounded-lg hover:bg-gray-50 transition-all duration-300 text-sm font-medium flex items-center gap-2"
+              className="px-4 py-2 border border-primary-300 text-primary-700 rounded-lg hover:bg-primary-50 transition-all duration-300 text-sm font-medium flex items-center gap-2"
               aria-label="Completar formulario de pre-llamada"
             >
               <ClipboardCheck className="w-4 h-4" />

@@ -184,8 +184,8 @@ const AdminPanel = () => {
           className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md"
         >
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-primary/10 rounded-full mb-4">
-              <LogIn className="w-8 h-8 text-brand-primary" />
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
+              <LogIn className="w-8 h-8 text-primary" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900">Panel de Administración</h2>
             <p className="text-gray-600 mt-2">Ingresa tus credenciales para continuar</p>
@@ -200,7 +200,7 @@ const AdminPanel = () => {
                 type="text"
                 value={loginForm.username}
                 onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
                 placeholder="Ingresa tu usuario"
                 required
               />
@@ -215,7 +215,7 @@ const AdminPanel = () => {
                   type={showPassword ? 'text' : 'password'}
                   value={loginForm.password}
                   onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary focus:border-transparent outline-none"
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
                   placeholder="Ingresa tu contraseña"
                   required
                 />
@@ -242,7 +242,7 @@ const AdminPanel = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-brand-primary text-white rounded-xl hover:bg-brand-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -287,7 +287,7 @@ const AdminPanel = () => {
               className="bg-white rounded-xl p-6 shadow-sm"
             >
               <div className="flex items-center justify-between mb-2">
-                <Users className="w-8 h-8 text-brand-primary" />
+                <Users className="w-8 h-8 text-primary" />
                 <span className="text-2xl font-bold text-gray-900">{stats.total}</span>
               </div>
               <p className="text-gray-600">Total Respuestas</p>
@@ -344,7 +344,7 @@ const AdminPanel = () => {
             <button
               onClick={fetchResponses}
               disabled={loading}
-              className="px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-primary/90 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               Actualizar

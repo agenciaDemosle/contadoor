@@ -165,7 +165,7 @@ const FormularioPreLlamada = () => {
     if (currentQuestion.type === 'contact') {
       return (
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold text-brand-dark mb-6">
+          <h3 className="text-xl font-semibold text-black mb-6">
             Información de contacto
           </h3>
           {currentQuestion.fields.map((field, idx) => (
@@ -185,7 +185,7 @@ const FormularioPreLlamada = () => {
                   value={formData[field.name]}
                   onChange={(e) => handleInputChange(field.name, e.target.value)}
                   placeholder={field.placeholder}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary focus:border-transparent outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                 />
               </div>
             </motion.div>
@@ -195,7 +195,7 @@ const FormularioPreLlamada = () => {
     } else if (currentQuestion.type === 'textarea') {
       return (
         <div>
-          <h3 className="text-xl font-semibold text-brand-dark mb-6">
+          <h3 className="text-xl font-semibold text-black mb-6">
             {currentQuestion.question}
           </h3>
           <motion.textarea
@@ -205,14 +205,14 @@ const FormularioPreLlamada = () => {
             onChange={(e) => handleInputChange(currentQuestion.id, e.target.value)}
             placeholder="Escribe tu respuesta aquí..."
             rows={4}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary focus:border-transparent outline-none transition-all resize-none"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
           />
         </div>
       );
     } else {
       return (
         <div>
-          <h3 className="text-xl font-semibold text-brand-dark mb-6">
+          <h3 className="text-xl font-semibold text-black mb-6">
             {currentQuestion.question}
           </h3>
           <div className="space-y-3">
@@ -222,7 +222,7 @@ const FormularioPreLlamada = () => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                className="flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all hover:border-brand-primary/50"
+                className="flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all hover:border-primary/50"
                 style={{
                   borderColor: formData[currentQuestion.id] === option
                     ? '#A05699'
@@ -249,10 +249,10 @@ const FormularioPreLlamada = () => {
                   }}
                 >
                   {formData[currentQuestion.id] === option && (
-                    <div className="w-2.5 h-2.5 bg-brand-primary rounded-full" />
+                    <div className="w-2.5 h-2.5 bg-primary rounded-full" />
                   )}
                 </div>
-                <span className="text-brand-dark">{option}</span>
+                <span className="text-black">{option}</span>
               </motion.label>
             ))}
           </div>
@@ -263,7 +263,7 @@ const FormularioPreLlamada = () => {
 
   if (submitStatus === 'success') {
     return (
-      <section className="py-16 bg-gradient-to-br from-brand-primary/5 to-white">
+      <section className="py-16 bg-gradient-to-br from-primary/5 to-white">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -278,7 +278,7 @@ const FormularioPreLlamada = () => {
             >
               <CheckCircle className="w-10 h-10 text-green-600" />
             </motion.div>
-            <h2 className="text-3xl font-bold text-brand-dark mb-4">
+            <h2 className="text-3xl font-bold text-black mb-4">
               ¡Formulario Enviado Exitosamente!
             </h2>
             <p className="text-gray-600 text-lg mb-6">
@@ -294,7 +294,7 @@ const FormularioPreLlamada = () => {
   }
 
   return (
-    <section id="formulario" className="py-16 bg-gradient-to-br from-brand-primary/5 to-white relative z-30">
+    <section id="formulario" className="py-16 bg-gradient-to-br from-primary/5 to-white relative z-30">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -307,18 +307,18 @@ const FormularioPreLlamada = () => {
               initial={{ opacity: 0, y: -20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-primary/10 rounded-full mb-4"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full mb-4"
             >
-              <span className="text-sm font-medium text-brand-primary">💡 Recomendado</span>
+              <span className="text-sm font-medium text-primary">💡 Recomendado</span>
             </motion.div>
-            <h2 className="text-3xl font-display font-bold text-brand-dark mb-4">
+            <h2 className="text-3xl font-display font-bold text-black mb-4">
               📋 Conozcámonos mejor antes de la reunión
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Estas preguntas nos ayudarán a preparar una reunión más personalizada y enfocada en lo que realmente importa para ti.
               <br />
               <br />
-              <span className="text-brand-primary font-medium">👉 Tu tiempo es valioso:</span> por eso queremos aprovechar cada minuto. Solo te tomará 2 minutos completar el formulario.
+              <span className="text-primary font-medium">👉 Tu tiempo es valioso:</span> por eso queremos aprovechar cada minuto. Solo te tomará 2 minutos completar el formulario.
             </p>
           </div>
 
@@ -329,13 +329,13 @@ const FormularioPreLlamada = () => {
                 <span className="text-sm text-gray-500">
                   Paso {currentStep + 1} de {totalSteps}
                 </span>
-                <span className="text-sm text-brand-primary font-medium">
+                <span className="text-sm text-primary font-medium">
                   {Math.round(progress)}% completado
                 </span>
               </div>
               <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-brand-primary"
+                  className="h-full bg-primary"
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
                   transition={{ duration: 0.3 }}
@@ -361,7 +361,7 @@ const FormularioPreLlamada = () => {
               <button
                 onClick={handlePrevious}
                 disabled={currentStep === 0}
-                className="px-6 py-3 text-brand-dark border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                className="px-6 py-3 text-black border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Anterior
@@ -371,7 +371,7 @@ const FormularioPreLlamada = () => {
                 <button
                   onClick={handleSubmit}
                   disabled={!isStepValid() || isSubmitting}
-                  className="px-6 py-3 bg-brand-primary text-white rounded-xl hover:bg-brand-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center gap-2 group"
+                  className="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center gap-2 group"
                 >
                   {isSubmitting ? (
                     <>
@@ -389,7 +389,7 @@ const FormularioPreLlamada = () => {
                 <button
                   onClick={handleNext}
                   disabled={!isStepValid()}
-                  className="px-6 py-3 bg-brand-primary text-white rounded-xl hover:bg-brand-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                  className="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                 >
                   Siguiente
                   <ArrowRight className="w-4 h-4" />
