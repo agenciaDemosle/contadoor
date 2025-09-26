@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import ProgressBar from './ProgressBar';
 import { analytics } from '../../lib/analytics';
 import { ClipboardCheck } from 'lucide-react';
-import logoColor from '../logo color.png';
+import logoColor from '../../assets/logo color.png';
 
 const Header = () => {
   const handleFormScroll = () => {

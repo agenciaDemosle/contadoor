@@ -1,6 +1,6 @@
 import { Mail, Phone, MapPin, Linkedin, Instagram, Facebook } from 'lucide-react';
 import { motion } from 'framer-motion';
-import logoColor from '../logo color.png';
+import logoColor from '../../assets/logo color.png';
 
 const Footer = () => {
   return (
