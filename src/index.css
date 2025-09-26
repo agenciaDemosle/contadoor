@@ -19,6 +19,15 @@
     box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.2);
   }
 
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   .shadow-brutal:hover {
     box-shadow: none;
   }

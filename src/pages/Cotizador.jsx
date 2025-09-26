@@ -123,7 +123,7 @@ const Stepper = ({ currentStep, totalSteps }) => {
 
   return (
     <div className="mb-8">
-      <div className="flex justify-between text-sm text-gray-600 mb-4">
+      <div className="hidden md:flex justify-between text-sm text-gray-600 mb-4">
         {steps.map((step, index) => (
           <span
             key={index}
@@ -132,6 +132,12 @@ const Stepper = ({ currentStep, totalSteps }) => {
             {step}
           </span>
         ))}
+      </div>
+      {/* Mobile version - solo muestra el paso actual */}
+      <div className="md:hidden text-center mb-4">
+        <span className="text-[#8A3F83] font-semibold text-sm">
+          Paso {currentStep + 1} de {totalSteps}: {steps[currentStep]}
+        </span>
       </div>
       <div className="w-full bg-gray-200 rounded-full h-1.5 mb-3">
         <motion.div

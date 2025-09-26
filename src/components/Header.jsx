@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { trackCTAClick } from '../lib/gtm';
+import { trackCTAClick, trackButtonClick } from '../lib/gtm';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -37,7 +38,7 @@ export default function Header() {
                       ? 'text-primary after:w-full'
                       : 'text-gray-700 hover:text-primary'
                   } after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:bg-primary after:w-0 after:transition-all after:duration-200 focus-visible:text-primary focus-visible:after:w-full`}
-                  onClick={() => trackCTAClick(item.name, 'header_menu', 'header_navigation', item.href)}
+                  onClick={() => trackButtonClick(item.name, 'header_navigation')}
                 >
                   {item.name}
                 </Link>
@@ -69,39 +70,64 @@ export default function Header() {
           </div>
         </div>
 
-        {mobileMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`relative block px-3 py-2 text-base font-medium transition-colors duration-200 outline-none ${
-                    location.pathname === item.href
-                      ? 'text-primary after:w-full'
-                      : 'text-gray-700 hover:text-primary'
-                  } after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:bg-primary after:w-0 after:transition-all after:duration-200 focus-visible:text-primary focus-visible:after:w-full`}
-                  onClick={() => {
-                    trackCTAClick(item.name, 'mobile_menu', 'mobile_navigation', item.href);
-                    setMobileMenuOpen(false);
-                  }}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <Link
-                to="/contacto"
-                className="block bg-primary text-white px-4 py-2 rounded-lg text-base font-semibold transition-all duration-200 hover:bg-primary/90 hover:scale-105 active:scale-95 hover:shadow-lg mt-4"
-                onClick={() => {
-                  trackCTAClick('Contactar', 'mobile_cta', 'mobile_navigation', '/contacto');
-                  setMobileMenuOpen(false);
-                }}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              className="md:hidden absolute left-0 right-0 top-full bg-white/95 backdrop-blur-md shadow-2xl border-t border-gray-100"
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              <motion.div
+                className="px-4 pt-4 pb-6 space-y-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1, duration: 0.2 }}
               >
-                Contactar
-              </Link>
-            </div>
-          </div>
-        )}
+                {navigation.map((item, index) => (
+                  <motion.div
+                    key={item.name}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05, duration: 0.2 }}
+                  >
+                    <Link
+                      to={item.href}
+                      className={`relative block px-4 py-3 text-base font-medium transition-all duration-300 outline-none rounded-xl ${
+                        location.pathname === item.href
+                          ? 'text-white bg-primary shadow-lg transform scale-[0.98]'
+                          : 'text-gray-700 hover:text-primary hover:bg-primary/10'
+                      }`}
+                      onClick={() => {
+                        trackButtonClick(item.name, 'mobile_navigation');
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      {item.name}
+                    </Link>
+                  </motion.div>
+                ))}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: navigation.length * 0.05 + 0.1, duration: 0.2 }}
+                >
+                  <Link
+                    to="/contacto"
+                    className="block border-2 border-primary text-primary px-4 py-3 rounded-xl text-base font-semibold transition-all duration-200 hover:bg-primary hover:text-white hover:scale-[0.98] active:scale-95 mt-4"
+                    onClick={() => {
+                      trackCTAClick('Contactar', 'mobile_cta', 'mobile_navigation', '/contacto');
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Contactar
+                  </Link>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
     </header>
   );

@@ -93,7 +93,7 @@ export default function Servicios() {
   return (
     <>
       {/* Hero centrado full-width con gradiente morado */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#6F326A] to-[#8A3F83]">
+      <section id="hero" data-section-name="Hero Servicios" className="relative overflow-hidden bg-gradient-to-b from-[#6F326A] to-[#8A3F83]">
         {/* Blobs radiales sutiles */}
         <div className="absolute -right-32 -top-32 w-[520px] h-[520px] bg-white/10 rounded-full blur-3xl"></div>
         <div className="absolute -left-32 -bottom-32 w-[420px] h-[420px] bg-black/10 rounded-full blur-3xl opacity-60"></div>
@@ -172,7 +172,7 @@ export default function Servicios() {
       </section>
 
       {/* Sección 2x2 cards numeradas */}
-      <section className="bg-[#F7F9FB] py-16 lg:py-24">
+      <section id="servicios-detalle" data-section-name="Servicios Detalle" className="bg-[#F7F9FB] py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
 
@@ -437,7 +437,7 @@ export default function Servicios() {
       </section>
 
       {/* CTA Final - Bloque morado oscuro disruptivo */}
-      <section className="bg-[#65276B]">
+      <section id="cta-final" data-section-name="CTA Final" className="bg-[#65276B]">
         <Container>
           <motion.div
             initial="hidden"

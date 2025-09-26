@@ -22,7 +22,7 @@ function ContactCTA({
   };
 
   return (
-    <section className="bg-[#F7F9FB] py-16 md:py-24">
+    <section id="contacto" data-section-name="Contacto" className="bg-[#F7F9FB] py-16 md:py-24">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-10">

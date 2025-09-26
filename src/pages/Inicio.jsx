@@ -1,7 +1,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageCircle, SearchCheck, CalendarCheck, Handshake, BarChart3, ShieldCheck, Ban, Headphones, Eye, Clock, Users, Bell, FileText, Rocket, Smile, CalendarDays, Star, ChevronDown, ChevronUp, Quote } from 'lucide-react';
+import { MessageCircle, SearchCheck, CalendarCheck, Handshake, BarChart3, ShieldCheck, Ban, Headphones, Eye, Clock, Users, Bell, FileText, Rocket, Smile, CalendarDays, Star, ChevronDown, ChevronUp, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
 import Container from '../components/Container';
 import Section from '../components/Section';
 import Button from '../components/Button';
@@ -127,9 +127,42 @@ function LazySection({ children, fallback = null }) {
 
 export default function Inicio() {
   const [openFAQ, setOpenFAQ] = useState(null);
+  const carouselRef = useRef(null);
 
   const toggleFAQ = (index) => {
     setOpenFAQ(openFAQ === index ? null : index);
+  };
+
+  // Función para permitir scroll horizontal con rueda del mouse en desktop
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+
+    const handleWheel = (e) => {
+      // Solo aplicar si hay overflow horizontal
+      if (carousel.scrollWidth > carousel.clientWidth) {
+        e.preventDefault();
+        carousel.scrollLeft += e.deltaY;
+      }
+    };
+
+    carousel.addEventListener('wheel', handleWheel, { passive: false });
+    return () => carousel.removeEventListener('wheel', handleWheel);
+  }, []);
+
+  const scrollCarousel = (direction) => {
+    if (!carouselRef.current) return;
+
+    const scrollAmount = 320; // ancho de card (320px) + gap
+    const currentScroll = carouselRef.current.scrollLeft;
+    const targetScroll = direction === 'left'
+      ? currentScroll - scrollAmount
+      : currentScroll + scrollAmount;
+
+    carouselRef.current.scrollTo({
+      left: targetScroll,
+      behavior: 'smooth'
+    });
   };
 
   const faqData = [
@@ -194,11 +227,11 @@ export default function Inicio() {
   return (
     <>
       {/* Hero sólido morado con texto blanco */}
-      <section className="relative min-h-[700px] flex items-center overflow-hidden bg-primary-600 text-white py-16 lg:py-24">
+      <section id="hero" data-section-name="Hero" className="relative min-h-[700px] flex items-center overflow-hidden bg-primary-600 text-white py-16 lg:py-24">
         {/* Overlay suave en mobile para contraste */}
         <div className="absolute inset-0 bg-black/10 md:bg-transparent" />
         <Container className="relative z-10 px-6 md:px-4">
-          <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-16 items-center">
+          <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-6 lg:gap-16 items-center">
             <motion.div
               initial="hidden"
               animate="visible"
@@ -410,11 +443,11 @@ export default function Inicio() {
               className="relative mt-8 lg:mt-0 flex justify-center lg:block"
               data-gtm="hero_image"
             >
-              <div className="absolute inset-0 bg-white/60 rounded-2xl transform rotate-6 scale-105 h-[300px] w-[240px] md:h-[400px] md:w-[320px] lg:h-[520px] lg:w-[400px]" />
+              <div className="absolute inset-0 bg-white/60 rounded-2xl transform rotate-2 md:rotate-6 scale-100 md:scale-105 h-[300px] w-[240px] md:h-[400px] md:w-[320px] lg:h-[520px] lg:w-[400px] left-0 md:left-auto top-0 md:top-auto" />
               <img
                 src="/hero.jpg"
                 alt="Equipo profesional de Contadoor trabajando"
-                className="rounded-2xl shadow-xl shadow-primary-900/20 relative z-10 object-cover h-[300px] w-[240px] md:h-[400px] md:w-[320px] lg:h-[520px] lg:w-[400px] object-top"
+                className="rounded-2xl shadow-xl shadow-primary-900/20 relative z-10 object-cover object-top h-[300px] w-[240px] md:h-[400px] md:w-[320px] lg:h-[520px] lg:w-[400px]"
                 loading="eager"
                 fetchPriority="high"
                 decoding="async"
@@ -426,7 +459,7 @@ export default function Inicio() {
 
 
       {/* Problemas comunes que resolvemos */}
-      <section className="bg-[#F7F9FB] py-16 lg:py-24">
+      <section id="problemas" data-section-name="Problemas" className="bg-[#F7F9FB] py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Título principal mejorado */}
           <div className="text-center">
@@ -451,7 +484,7 @@ export default function Inicio() {
           </div>
 
           {/* Grid de cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mt-16 pt-6 overflow-visible">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-6 mt-16 pt-6 overflow-visible">
             {/* Card 1 - Contador fantasma */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -459,7 +492,7 @@ export default function Inicio() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.3 }}
               whileHover={{ scale: 1.05, y: -5 }}
-              className="rounded-3xl bg-white border border-gray-200 shadow-[0_10px_30px_rgba(17,24,39,0.06)] p-6 md:p-8 relative hover:shadow-xl hover:shadow-primary-200/30 transition-all duration-300 mt-6 cursor-pointer"
+              className="rounded-3xl bg-white border border-gray-200 shadow-[0_10px_30px_rgba(17,24,39,0.06)] p-6 md:p-6 relative hover:shadow-xl hover:shadow-primary-200/30 transition-all duration-300 mt-6 cursor-pointer"
               data-gtm="pain_point_1"
             >
               {/* Número flotante */}
@@ -511,7 +544,7 @@ export default function Inicio() {
                   repeatDelay: 6
                 }
               }}
-              className="rounded-3xl bg-primary-600 shadow-[0_12px_35px_rgba(17,24,39,0.08)] p-6 md:p-8 relative hover:shadow-2xl hover:shadow-primary-200/40 transition-all duration-300 mt-6 md:scale-105 cursor-pointer"
+              className="rounded-3xl bg-primary-600 shadow-[0_12px_35px_rgba(17,24,39,0.08)] p-6 md:p-6 relative hover:shadow-2xl hover:shadow-primary-200/40 transition-all duration-300 mt-6 md:scale-105 cursor-pointer"
               data-gtm="pain_point_2"
             >
               {/* Badge "MÁS COMÚN" con icono */}
@@ -564,7 +597,7 @@ export default function Inicio() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.7 }}
               whileHover={{ scale: 1.05, y: -5 }}
-              className="rounded-3xl bg-white border border-gray-200 shadow-[0_10px_30px_rgba(17,24,39,0.06)] p-6 md:p-8 relative hover:shadow-xl hover:shadow-primary-200/30 transition-all duration-300 mt-6 cursor-pointer"
+              className="rounded-3xl bg-white border border-gray-200 shadow-[0_10px_30px_rgba(17,24,39,0.06)] p-6 md:p-6 relative hover:shadow-xl hover:shadow-primary-200/30 transition-all duration-300 mt-6 cursor-pointer"
               data-gtm="pain_point_3"
             >
               {/* Número flotante */}
@@ -645,7 +678,7 @@ export default function Inicio() {
       </section>
 
       {/* Testimonios/Casos de Éxito - Prueba social */}
-      <section className="py-16 lg:py-24 bg-gradient-to-br from-gray-50 to-white">
+      <section id="testimonios" data-section-name="Testimonios" className="py-16 lg:py-24 bg-gradient-to-br from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <motion.div
@@ -677,135 +710,248 @@ export default function Inicio() {
             </motion.div>
           </motion.div>
 
-          {/* Grid de testimonios */}
-          <div className="grid md:grid-cols-3 gap-8 items-stretch">
-
-            {/* Testimonio 1 */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 relative flex flex-col h-full"
-              data-gtm="testimonial_card_1"
+          {/* Carrusel de testimonios */}
+          <div className="relative">
+            {/* Botones de navegación - Solo desktop */}
+            <button
+              onClick={() => scrollCarousel('left')}
+              className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white shadow-lg rounded-full items-center justify-center text-primary-600 hover:bg-primary-50 transition-all duration-200"
+              aria-label="Testimonio anterior"
             >
-              <Quote className="absolute top-4 right-4 w-8 h-8 text-primary-200" />
+              <ChevronLeft size={20} />
+            </button>
 
-              <div className="flex items-center gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-
-              <blockquote className="text-gray-700 mb-6 leading-relaxed flex-grow">
-                "Con Contadoor llevamos 2 años sin ninguna multa. Antes pagábamos $180.000 mensuales en multas por atrasos. Ahora tenemos todo al día y gastamos $0 en multas."
-              </blockquote>
-
-              <div className="mt-auto">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center font-bold text-primary-600">
-                    CM
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900">Carlos Mendoza</div>
-                    <div className="text-sm text-gray-500">CEO, Constructora del Valle</div>
-                    <div className="text-xs text-primary-600 font-medium">Cliente desde 2022</div>
-                  </div>
-                </div>
-
-                <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                  <div className="text-green-700 font-semibold text-sm">Resultado: $0 en multas en 24 meses</div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Testimonio 2 - Destacado */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-gradient-to-br from-primary-600 to-primary-700 text-white rounded-2xl p-8 shadow-xl relative md:scale-105 flex flex-col h-full"
-              data-gtm="testimonial_card_featured"
+            <button
+              onClick={() => scrollCarousel('right')}
+              className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white shadow-lg rounded-full items-center justify-center text-primary-600 hover:bg-primary-50 transition-all duration-200"
+              aria-label="Siguiente testimonio"
             >
-              <motion.div
-                initial={{ opacity: 0, scale: 0 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.5, type: "spring" }}
-                className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white text-primary-600 px-3 py-1 rounded-full text-xs font-black"
-              >
-                ⭐ CASO DESTACADO
-              </motion.div>
+              <ChevronRight size={20} />
+            </button>
 
-              <Quote className="absolute top-4 right-4 w-8 h-8 text-white/30" />
-
-              <div className="flex items-center gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-yellow-300 text-yellow-300" />
-                ))}
-              </div>
-
-              <blockquote className="text-white/95 mb-6 leading-relaxed font-medium flex-grow">
-                "Pasamos de estar siempre estresados por los vencimientos a dormir tranquilos. El WhatsApp directo con nuestro asesor es oro puro. Responden en menos de 10 minutos."
-              </blockquote>
-
-              <div className="mt-auto">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center font-bold text-white">
-                    AS
-                  </div>
-                  <div>
-                    <div className="font-semibold text-white">Ana Soto</div>
-                    <div className="text-sm text-white/80">Gerente, Importadora Pacific</div>
-                    <div className="text-xs text-white/70">Cliente desde 2021</div>
-                  </div>
-                </div>
-
-                <div className="p-3 bg-white/10 backdrop-blur rounded-lg border border-white/20">
-                  <div className="text-white font-semibold text-sm">Resultado: Respuesta promedio 8 minutos</div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Testimonio 3 */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 relative flex flex-col h-full"
-              data-gtm="testimonial_card_3"
+            <div
+              ref={carouselRef}
+              className="overflow-x-auto pb-8 scrollbar-hide"
+              style={{ WebkitOverflowScrolling: 'touch', scrollBehavior: 'smooth' }}
             >
-              <Quote className="absolute top-4 right-4 w-8 h-8 text-primary-200" />
+              <div className="flex gap-6 px-4 py-4 w-max">
 
-              <div className="flex items-center gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
+                {/* Testimonio 1 - Sergio Lucy */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.1 }}
+                  className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 relative flex flex-col w-80 flex-shrink-0"
+                  data-gtm="testimonial_card_1"
+                >
+                  <Quote className="absolute top-4 right-4 w-8 h-8 text-primary-200" />
 
-              <blockquote className="text-gray-700 mb-6 leading-relaxed flex-grow">
-                "El traspaso fue súper fácil. En 48 horas ya tenían todo funcionando. Ahora entiendo realmente cómo va mi negocio gracias a sus informes claros."
-              </blockquote>
-
-              <div className="mt-auto">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center font-bold text-primary-600">
-                    MR
+                  <div className="flex items-center gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    ))}
                   </div>
-                  <div>
-                    <div className="font-semibold text-gray-900">Miguel Ramírez</div>
-                    <div className="text-sm text-gray-500">Dueño, Restaurante El Encuentro</div>
-                    <div className="text-xs text-primary-600 font-medium">Cliente desde 2023</div>
-                  </div>
-                </div>
 
-                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="text-blue-700 font-semibold text-sm">Resultado: Onboarding en 48 horas</div>
-                </div>
+                  <blockquote className="text-gray-700 mb-6 leading-relaxed flex-grow">
+                    "Me recomendaron sus servicios para crear mi emprendimiento e iniciar actividades, ahora ya después de 2 años junto a ellos los e recomendado a todos los que necesitan apoyo. Siempre atentos y dispuestos ayudar y solucionar problemas."
+                  </blockquote>
+
+                  <div className="mt-auto">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center font-bold text-primary-600">
+                        SL
+                      </div>
+                      <div>
+                        <div className="font-semibold text-gray-900">Sergio Lucy</div>
+                        <div className="text-sm text-gray-500">Yellow Envios</div>
+                        <div className="text-xs text-primary-600 font-medium">Hace 3 años</div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                      <div className="text-green-700 font-semibold text-sm">2 años de acompañamiento exitoso</div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Testimonio 2 - Héctor Gatica - Destacado */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="bg-gradient-to-br from-primary-600 to-primary-700 text-white rounded-2xl p-6 shadow-xl relative flex flex-col w-80 flex-shrink-0 transform scale-105"
+                  style={{ margin: '0 20px' }}
+                  data-gtm="testimonial_card_featured"
+                >
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: 0.5, type: "spring" }}
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white text-primary-600 px-3 py-1 rounded-full text-xs font-black"
+                  >
+                    ⭐ CASO DESTACADO
+                  </motion.div>
+
+                  <Quote className="absolute top-4 right-4 w-8 h-8 text-white/30" />
+
+                  <div className="flex items-center gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-yellow-300 text-yellow-300" />
+                    ))}
+                  </div>
+
+                  <blockquote className="text-white/95 mb-6 leading-relaxed font-medium flex-grow">
+                    "Servicios excelente 100% recomendado. Siempre atento a cualquier requerimiento."
+                  </blockquote>
+
+                  <div className="mt-auto">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center font-bold text-white">
+                        HG
+                      </div>
+                      <div>
+                        <div className="font-semibold text-white">Héctor Omar Gatica Peña</div>
+                        <div className="text-sm text-white/80">Servicios de Ingeniería OG SPA</div>
+                        <div className="text-xs text-white/70">Hace 3 años</div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-white/10 backdrop-blur rounded-lg border border-white/20">
+                      <div className="text-white font-semibold text-sm">100% recomendado</div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Testimonio 3 - Valentina Armingol */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                  className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 relative flex flex-col w-80 flex-shrink-0"
+                  data-gtm="testimonial_card_3"
+                >
+                  <Quote className="absolute top-4 right-4 w-8 h-8 text-primary-200" />
+
+                  <div className="flex items-center gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+
+                  <blockquote className="text-gray-700 mb-6 leading-relaxed flex-grow">
+                    "Muy buen servicio."
+                  </blockquote>
+
+                  <div className="mt-auto">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center font-bold text-primary-600">
+                        VA
+                      </div>
+                      <div>
+                        <div className="font-semibold text-gray-900">Valentina Armingol</div>
+                        <div className="text-sm text-gray-500">Centro Terapéutico Creesiente SPA</div>
+                        <div className="text-xs text-primary-600 font-medium">Hace 3 años</div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="text-blue-700 font-semibold text-sm">Servicio de calidad</div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Testimonio 4 - Orlando Muñoz */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 relative flex flex-col w-80 flex-shrink-0"
+                  data-gtm="testimonial_card_4"
+                >
+                  <Quote className="absolute top-4 right-4 w-8 h-8 text-primary-200" />
+
+                  <div className="flex items-center gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+
+                  <blockquote className="text-gray-700 mb-6 leading-relaxed flex-grow">
+                    "Excelente atención y servicio. Llevo trabajando con ellos desde el 2015. Gestionan mis IVAs, rentas, pago de remuneraciones al personal, etc. Siempre atentos a mis requerimientos con una rápida respuesta."
+                  </blockquote>
+
+                  <div className="mt-auto">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center font-bold text-primary-600">
+                        OM
+                      </div>
+                      <div>
+                        <div className="font-semibold text-gray-900">Orlando Muñoz</div>
+                        <div className="text-sm text-gray-500">Oparts SPA</div>
+                        <div className="text-xs text-primary-600 font-medium">Cliente desde 2015</div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                      <div className="text-green-700 font-semibold text-sm">9+ años de confianza</div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Testimonio 5 - Anigret Cea */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.5 }}
+                  className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 relative flex flex-col w-80 flex-shrink-0"
+                  data-gtm="testimonial_card_5"
+                >
+                  <Quote className="absolute top-4 right-4 w-8 h-8 text-primary-200" />
+
+                  <div className="flex items-center gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+
+                  <blockquote className="text-gray-700 mb-6 leading-relaxed flex-grow">
+                    "Excelente servicio. Siempre dispuesto a ayudar y resolver problemas en la contabilidad de mi negocio."
+                  </blockquote>
+
+                  <div className="mt-auto">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center font-bold text-primary-600">
+                        AC
+                      </div>
+                      <div>
+                        <div className="font-semibold text-gray-900">Anigret Cea</div>
+                        <div className="text-sm text-gray-500">Comercializadora Mascotec Ltda.</div>
+                        <div className="text-xs text-primary-600 font-medium">Hace 3 años</div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="text-blue-700 font-semibold text-sm">Soluciones contables efectivas</div>
+                    </div>
+                  </div>
+                </motion.div>
+
               </div>
-            </motion.div>
+            </div>
+
+            {/* Indicador de scroll */}
+            <div className="text-center mt-4">
+              <p className="text-sm text-gray-500">
+                <span className="md:hidden">← Desliza para ver más testimonios →</span>
+                <span className="hidden md:inline">Usa los botones o rueda del mouse para navegar</span>
+              </p>
+            </div>
           </div>
 
           {/* Stats de confianza */}
@@ -814,7 +960,7 @@ export default function Inicio() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
+            className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 text-center"
           >
             <div>
               <div className="text-3xl md:text-4xl font-extrabold text-primary-600">
@@ -876,7 +1022,7 @@ export default function Inicio() {
       </section>
 
       {/* Cómo funciona - Timeline mejorado */}
-      <section className="py-20 relative overflow-hidden">
+      <section id="como-funciona" data-section-name="Cómo Funciona" className="py-20 relative overflow-hidden">
         <div className="absolute inset-0">
           <img
             src="/foto1.jpg"
@@ -939,16 +1085,16 @@ export default function Inicio() {
               </div>
 
               {/* Línea conectora animada - Mobile */}
-              <div className="md:hidden absolute left-12 top-0 bottom-0 w-1 bg-gray-200 rounded-full" />
+              <div className="md:hidden absolute left-1/2 -translate-x-0.5 top-0 bottom-0 w-0.5 bg-gray-100 rounded-full -z-10 opacity-10" />
               <motion.div
                 initial={{ height: 0 }}
                 whileInView={{ height: "100%" }}
                 viewport={{ once: true }}
                 transition={{ duration: 2, delay: 0.5 }}
-                className="md:hidden absolute left-12 top-0 w-1 bg-gradient-to-b from-primary-400 to-primary-600 rounded-full"
+                className="md:hidden absolute left-1/2 -translate-x-0.25 top-0 w-0.5 bg-gradient-to-b from-primary-300 to-primary-400 rounded-full -z-10 opacity-15"
               />
 
-              <div className="grid md:grid-cols-4 gap-8 md:gap-4">
+              <div className="grid md:grid-cols-4 gap-6 md:gap-4">
                 {/* Paso 1 */}
                 <motion.div
                   className="text-center md:text-center relative"
@@ -1110,7 +1256,7 @@ export default function Inicio() {
       </section>
 
       {/* Beneficios - Rediseño 2025 optimizado */}
-      <section className="relative overflow-hidden text-white py-16 lg:py-24" style={{ background: 'linear-gradient(to bottom, #6F326A, #8A3F83)' }}>
+      <section id="beneficios" data-section-name="Beneficios" className="relative overflow-hidden text-white py-16 lg:py-24" style={{ background: 'linear-gradient(to bottom, #6F326A, #8A3F83)' }}>
         {/* Patrón de puntos sutil */}
         <div
           className="absolute inset-0 opacity-30"
@@ -1121,8 +1267,8 @@ export default function Inicio() {
         />
 
         {/* Vignette blobs */}
-        <div className="absolute -top-20 -right-20 w-80 h-80 bg-white/5 rounded-full blur-3xl opacity-30" />
-        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-white/5 rounded-full blur-3xl opacity-30" />
+        <div className="absolute -top-20 -right-20 w-72 h-80 bg-white/5 rounded-full blur-3xl opacity-30" />
+        <div className="absolute -bottom-20 -left-20 w-72 h-80 bg-white/5 rounded-full blur-3xl opacity-30" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
@@ -1135,7 +1281,7 @@ export default function Inicio() {
             {/* Header mejorado con mesh gradient */}
             <div className="text-center mb-16 relative">
               {/* Mesh gradient sutil detrás del título */}
-              <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-96 h-32 bg-gradient-to-r from-white/5 to-primary-200/10 rounded-full blur-3xl" />
+              <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-96 h-32 bg-gradient-to-r from-white/5 to-primary-200/10 rounded-full blur-3xl" />
 
               <div className="inline-flex px-4 py-2 rounded-full bg-white/10 text-primary-300 text-xs font-semibold ring-1 ring-white/15 mb-6">
                 ✨ BENEFICIOS 2025
@@ -1355,7 +1501,7 @@ export default function Inicio() {
       </section>
 
       {/* Comparemos opciones - Optimizado 2025 */}
-      <section className="bg-white py-16 lg:py-24">
+      <section id="comparacion" data-section-name="Comparación" className="bg-white py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <motion.div
@@ -1377,7 +1523,7 @@ export default function Inicio() {
           </motion.div>
 
           {/* Grid de tarjetas diferenciadas - Desktop / Carrusel - Mobile */}
-          <div className="hidden md:grid md:grid-cols-3 gap-6 lg:gap-8 mt-12">
+          <div className="hidden md:grid md:grid-cols-3 gap-6 lg:gap-6 mt-12 pt-6 overflow-visible">
 
             {/* Card 1 - Contador Independiente (Roja - Problemas) */}
             <motion.div
@@ -1385,7 +1531,7 @@ export default function Inicio() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="rounded-3xl bg-white border-2 border-red-200 p-8 shadow-lg hover:shadow-red-100 transition-all"
+              className="rounded-3xl bg-white border-2 border-red-200 p-6 shadow-lg hover:shadow-red-100 transition-all"
               data-gtm="compare_card_independiente"
             >
               <div className="flex items-center gap-3 mb-4">
@@ -1450,7 +1596,7 @@ export default function Inicio() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="rounded-3xl bg-white border-2 border-yellow-200 p-8 shadow-lg hover:shadow-yellow-100 transition-all"
+              className="rounded-3xl bg-white border-2 border-yellow-200 p-6 shadow-lg hover:shadow-yellow-100 transition-all"
               data-gtm="compare_card_software"
             >
               <div className="flex items-center gap-3 mb-4">
@@ -1515,7 +1661,7 @@ export default function Inicio() {
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.3, type: "spring", damping: 20 }}
-              className="relative rounded-3xl bg-gradient-to-br from-primary-600 to-primary-700 text-white p-8 shadow-2xl ring-2 ring-primary-300 md:transform md:scale-105"
+              className="relative rounded-3xl bg-gradient-to-br from-primary-600 to-primary-700 text-white p-6 shadow-2xl ring-2 ring-primary-300 md:transform md:scale-105"
               data-gtm="compare_card_contadoor"
             >
               {/* Badge RECOMENDADO animado con pulse */}
@@ -1524,7 +1670,7 @@ export default function Inicio() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.5, type: "spring", damping: 15 }}
-                className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-white text-primary-600 text-sm font-black shadow-lg animate-pulse"
+                className="hidden md:block absolute -top-4 left-10 px-3 py-1 rounded-full bg-white text-primary-600 text-xs font-black shadow-lg"
               >
                 ✨ RECOMENDADO ✨
               </motion.div>
@@ -1610,8 +1756,8 @@ export default function Inicio() {
           </div>
 
           {/* Carrusel móvil */}
-          <div className="md:hidden mt-12">
-            <div className="flex overflow-x-auto gap-4 px-4 pb-4 snap-x snap-mandatory scrollbar-hide">
+          <div className="md:hidden mt-12 pt-6">
+            <div className="flex overflow-x-auto gap-4 px-4 pb-4 snap-x snap-mandatory scrollbar-hide overflow-y-visible">
 
               {/* Card Mobile 1 - Contador Independiente */}
               <motion.div
@@ -1619,7 +1765,7 @@ export default function Inicio() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className="flex-shrink-0 w-80 rounded-3xl bg-white border-2 border-red-200 p-6 shadow-lg snap-center"
+                className="flex-shrink-0 w-72 rounded-3xl bg-white border-2 border-red-200 p-6 shadow-lg snap-center"
                 data-gtm="compare_card_independiente"
               >
                 <div className="flex items-center gap-3 mb-4">
@@ -1656,7 +1802,7 @@ export default function Inicio() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="flex-shrink-0 w-80 rounded-3xl bg-white border-2 border-yellow-200 p-6 shadow-lg snap-center"
+                className="flex-shrink-0 w-72 rounded-3xl bg-white border-2 border-yellow-200 p-6 shadow-lg snap-center"
                 data-gtm="compare_card_software"
               >
                 <div className="flex items-center gap-3 mb-4">
@@ -1693,11 +1839,11 @@ export default function Inicio() {
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.3, type: "spring", damping: 20 }}
-                className="relative flex-shrink-0 w-80 rounded-3xl bg-gradient-to-br from-primary-600 to-primary-700 text-white p-6 shadow-2xl ring-2 ring-primary-300 snap-center"
+                className="relative flex-shrink-0 w-72 rounded-3xl bg-gradient-to-br from-primary-600 to-primary-700 text-white p-6 shadow-2xl ring-2 ring-primary-300 snap-center"
                 data-gtm="compare_card_contadoor"
               >
                 {/* Badge RECOMENDADO */}
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-white text-primary-600 text-xs font-black shadow-lg animate-pulse">
+                <div className="hidden absolute -top-4 left-6 px-3 py-1 rounded-full bg-white text-primary-600 text-xs font-black shadow-lg">
                   ✨ RECOMENDADO ✨
                 </div>
 
@@ -1760,7 +1906,7 @@ export default function Inicio() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="mt-16 rounded-3xl bg-gradient-to-r from-primary-50 to-white p-8 md:p-12 text-center border border-primary-100"
+            className="mt-16 rounded-3xl bg-gradient-to-r from-primary-50 to-white p-6 md:p-12 text-center border border-primary-100"
           >
             <h4 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
               La diferencia está en los <span className="text-primary-600">resultados reales</span>
@@ -1788,7 +1934,7 @@ export default function Inicio() {
 
       {/* FAQ - Preguntas Frecuentes */}
       <LazySection fallback={<div className="h-[600px] bg-gray-50 animate-pulse rounded-lg mx-4" />}>
-        <section className="py-16 lg:py-24 bg-white">
+        <section id="faq" data-section-name="FAQ" className="py-16 lg:py-24 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <motion.div
@@ -1841,7 +1987,7 @@ export default function Inicio() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="text-center mt-16"
           >
-            <div className="bg-gradient-to-r from-primary-50 to-white p-8 rounded-2xl border border-primary-100">
+            <div className="bg-gradient-to-r from-primary-50 to-white p-6 rounded-2xl border border-primary-100">
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
                 ¿Tienes otra pregunta? Hablemos directamente
               </h3>
@@ -1883,7 +2029,7 @@ export default function Inicio() {
       </LazySection>
 
       {/* CTA Final - Último empujón para conversión */}
-      <section className="py-20 lg:py-28 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 text-white relative overflow-hidden">
+      <section id="cta-final" data-section-name="CTA Final" className="py-20 lg:py-28 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 text-white relative overflow-hidden">
         {/* Background decorativo */}
         <div className="absolute inset-0 bg-[url('/noise.png')] opacity-5"></div>
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
@@ -1932,7 +2078,7 @@ export default function Inicio() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16"
+              className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16"
             >
               <div className="text-center">
                 <div className="text-4xl md:text-5xl font-extrabold text-white mb-2">
