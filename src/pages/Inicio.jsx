@@ -227,232 +227,117 @@ export default function Inicio() {
   return (
     <>
       {/* Hero sólido morado con texto blanco */}
-      <section id="hero" data-section-name="Hero" className="relative min-h-[700px] flex items-center overflow-hidden bg-primary-600 text-white py-16 lg:py-24">
+      <section id="hero" data-section-name="Hero" className="relative min-h-[700px] flex items-center overflow-hidden bg-primary-600 text-white py-16 lg:py-20">
         {/* Overlay suave en mobile para contraste */}
         <div className="absolute inset-0 bg-black/10 md:bg-transparent" />
-        <Container className="relative z-10 px-6 md:px-4">
-          <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-6 lg:gap-16 items-center">
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={slideIn}
-              transition={{ duration: 0.6 }}
-              className="text-center md:text-left"
-            >
+        <Container className="relative z-10 px-4 md:px-6 max-w-7xl">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <div className="text-center md:text-left space-y-8">
+              {/* Pill de urgencia */}
               <motion.div
-                variants={bounceIn}
-                initial="hidden"
-                animate="visible"
-                transition={{ delay: 0.1 }}
-                className="inline-block mb-6"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
               >
-                <a
-                  href="#reseñas"
-                  className="bg-white text-primary-600 px-4 py-2 rounded-full text-sm font-semibold hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer block group relative"
-                  data-gtm="hero_badge_trust"
-                  title="Empresas de todas las industrias en Chile confían en nosotros"
-                >
-                  <motion.span
-                    animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
-                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-                    className="inline-block mr-2 text-yellow-400"
-                  >
-                    ⭐
-                  </motion.span>
-                  +500 empresas confían en nosotros
-
-                  {/* Tooltip */}
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
-                    Empresas de todas las industrias en Chile confían en nosotros
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
-                  </div>
-                </a>
+                <span className="inline-block text-xs font-semibold text-yellow-300 bg-yellow-500/20 px-4 py-2 rounded-full border border-yellow-400/30" data-gtm="hero_pill_urgency">
+                  ⚡ Solo 5 cupos este mes
+                </span>
               </motion.div>
 
-              {/* Badge de garantía */}
-              <motion.div
-                variants={bounceIn}
-                initial="hidden"
-                animate="visible"
-                transition={{ delay: 0.2 }}
-                className="inline-block mb-6 ml-4"
-              >
-                <div className="bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-semibold border border-green-200">
-                  <span className="mr-2">🛡️</span>
-                  Garantía 60 días o te devolvemos el dinero
-                </div>
-              </motion.div>
-
+              {/* H1 */}
               <motion.h1
-                variants={slideUp}
-                initial="hidden"
-                animate="visible"
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="mb-6 leading-tight tracking-tight"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+                className="text-4xl font-extrabold leading-tight max-w-[20ch] mx-auto md:mx-0"
                 data-gtm="hero_headline"
-                role="banner"
               >
-                <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white">
-                  Ahorra tiempo y evita multas.
-                </span>
-                <br />
-                <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium text-primary-200">
-                  Tu negocio <span className="underline decoration-primary-400 decoration-4">al día</span>, siempre.
-                </span>
+                Ahorra tiempo y evita multas. Tu negocio al día, siempre.
               </motion.h1>
 
+              {/* Subtítulo */}
               <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="text-lg md:text-xl mb-6 max-w-[56ch] opacity-90 leading-relaxed"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.3 }}
+                className="text-base text-white/90 leading-relaxed max-w-[65ch] mx-auto md:mx-0"
               >
                 Contabilidad, impuestos y laboral en un solo lugar, con un asesor directo que te avisa antes de cada vencimiento.
               </motion.p>
 
-              {/* Bullets de beneficios con iconos Lucide */}
-              <div className="mb-8 space-y-3">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.4 }}
-                  className="flex items-start gap-3 text-base opacity-90"
-                >
-                  <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ duration: 0.4, delay: 0.5, type: "spring" }}
-                    className="bg-green-500 p-1.5 rounded-full mt-0.5 flex-shrink-0"
-                  >
-                    <Bell size={14} className="text-white" />
-                  </motion.div>
-                  <span>Te avisamos antes de cada vencimiento</span>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.5 }}
-                  className="flex items-start gap-3 text-base opacity-90"
-                >
-                  <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ duration: 0.4, delay: 0.6, type: "spring" }}
-                    className="bg-green-500 p-1.5 rounded-full mt-0.5 flex-shrink-0"
-                  >
-                    <MessageCircle size={14} className="text-white" />
-                  </motion.div>
-                  <span>Habla directo con tu asesor por WhatsApp</span>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.6 }}
-                  className="flex items-start gap-3 text-base opacity-90"
-                >
-                  <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ duration: 0.4, delay: 0.7, type: "spring" }}
-                    className="bg-green-500 p-1.5 rounded-full mt-0.5 flex-shrink-0"
-                  >
-                    <FileText size={14} className="text-white" />
-                  </motion.div>
-                  <span>Informe mensual claro (sin letra chica)</span>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.7 }}
-                  className="flex items-start gap-3 text-base opacity-90"
-                >
-                  <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ duration: 0.4, delay: 0.8, type: "spring" }}
-                    className="bg-green-500 p-1.5 rounded-full mt-0.5 flex-shrink-0"
-                  >
-                    <Rocket size={14} className="text-white" />
-                  </motion.div>
-                  <span>Onboarding en 48h con traspaso guiado</span>
-                </motion.div>
-              </div>
+              {/* CTAs */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.6 }}
-                className="space-y-4"
+                transition={{ duration: 0.4, delay: 0.4 }}
+                className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start"
               >
-                <div className="flex flex-wrap gap-4">
-                  <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
-                    <Button
-                      to="/cotizador"
-                      className="!bg-white !text-primary-600 hover:shadow-[6px_6px_0_#000000] transition-all focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 font-black shadow-[4px_4px_0_#000000] !py-4 !px-8 !text-base md:!text-lg"
-                      data-gtm="hero_cta_primary"
-                      aria-label="Cotizar mi plan de contabilidad"
-                    >
-                      Cotizar mi plan
-                    </Button>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
-                    <Button
-                      to="/contacto"
-                      className="!bg-transparent !text-white border-2 border-white hover:!bg-white hover:!text-primary-600 transition-all focus:ring-2 focus:ring-white focus:ring-offset-2 font-bold flex items-center gap-2 !py-4 !px-8 !text-base md:!text-lg"
-                      data-gtm="hero_cta_secondary"
-                      aria-label="Hablar con un asesor ahora"
-                    >
-                      <MessageCircle size={18} />
-                      Hablar con un asesor
-                    </Button>
-                  </motion.div>
+                <Button
+                  to="/cotizador"
+                  className="!bg-white !text-primary-600 hover:shadow-[6px_6px_0_#000000] transition-all font-black shadow-[4px_4px_0_#000000] !py-4 !px-8 !text-base w-full sm:w-auto"
+                  data-gtm="hero_cta_primary"
+                >
+                  Cotizar mi plan
+                </Button>
+                <Button
+                  to="/contacto"
+                  className="!bg-transparent !text-white border-2 border-white hover:!bg-white hover:!text-primary-600 transition-all font-bold flex items-center gap-2 justify-center !py-4 !px-8 !text-base w-full sm:w-auto"
+                  data-gtm="hero_cta_secondary"
+                >
+                  <MessageCircle size={18} />
+                  Hablar con un asesor
+                </Button>
+              </motion.div>
+            </div>
+
+            <div className="space-y-6">
+              {/* Imagen sin elementos flotantes */}
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.5 }}
+                className="relative flex justify-center"
+                data-gtm="hero_image"
+              >
+                <div className="absolute inset-0 bg-white/60 rounded-2xl transform rotate-6 scale-105 h-[320px] w-[260px] lg:h-[480px] lg:w-[380px] hidden lg:block" />
+                <img
+                  src="/images/hero.jpg"
+                  alt="Equipo profesional de Contadoor trabajando"
+                  className="rounded-2xl shadow-xl shadow-primary-900/20 relative z-10 object-cover object-top h-[320px] w-[260px] lg:h-[480px] lg:w-[380px]"
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
+                />
+              </motion.div>
+
+              {/* Stats grid 2x2 debajo de la imagen (solo mobile) */}
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.6 }}
+                className="grid grid-cols-2 gap-3 lg:hidden"
+              >
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center" data-gtm="hero_stat_multas">
+                  <div className="text-2xl font-bold mb-1">0</div>
+                  <div className="text-xs text-white/80">Multas SII</div>
                 </div>
-                <div className="space-y-1">
-                  <motion.p
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, delay: 0.7, type: "spring" }}
-                    className="text-xs text-yellow-300 font-semibold bg-yellow-500/20 px-3 py-1 rounded-full inline-block border border-yellow-400/30"
-                  >
-                    ⚡ Solo 8 cupos disponibles este mes
-                  </motion.p>
-                  <p className="text-xs text-white/70">
-                    Respuesta en &lt;15 min hábiles.
-                  </p>
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5, delay: 0.8 }}
-                    className="text-xs text-white/60"
-                  >
-                    100% gratis, sin compromiso.
-                  </motion.p>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center" data-gtm="hero_stat_clientes">
+                  <div className="text-2xl font-bold mb-1">500+</div>
+                  <div className="text-xs text-white/80">Clientes</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center" data-gtm="hero_stat_rating">
+                  <div className="text-2xl font-bold mb-1 flex items-center justify-center gap-1">
+                    <span>4.9</span>
+                    <span className="text-yellow-400 text-lg">⭐</span>
+                  </div>
+                  <div className="text-xs text-white/80">Calificación</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center" data-gtm="hero_stat_onboarding">
+                  <div className="text-2xl font-bold mb-1">48h</div>
+                  <div className="text-xs text-white/80">Onboarding</div>
                 </div>
               </motion.div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              whileInView={{ y: [-5, 5, -5] }}
-              transition={{
-                duration: 0.6,
-                ease: "easeOut",
-                delay: 0.15,
-                y: { duration: 6, repeat: Infinity, ease: "easeInOut" }
-              }}
-              className="relative mt-8 lg:mt-0 flex justify-center lg:block"
-              data-gtm="hero_image"
-            >
-              <div className="absolute inset-0 bg-white/60 rounded-2xl transform rotate-2 md:rotate-6 scale-100 md:scale-105 h-[300px] w-[240px] md:h-[400px] md:w-[320px] lg:h-[520px] lg:w-[400px] left-0 md:left-auto top-0 md:top-auto" />
-              <img
-                src="/hero.jpg"
-                alt="Equipo profesional de Contadoor trabajando"
-                className="rounded-2xl shadow-xl shadow-primary-900/20 relative z-10 object-cover object-top h-[300px] w-[240px] md:h-[400px] md:w-[320px] lg:h-[520px] lg:w-[400px]"
-                loading="eager"
-                fetchPriority="high"
-                decoding="async"
-              />
-            </motion.div>
+            </div>
           </div>
         </Container>
       </section>
@@ -731,10 +616,10 @@ export default function Inicio() {
 
             <div
               ref={carouselRef}
-              className="overflow-x-auto pb-8 scrollbar-hide"
+              className="overflow-x-auto pb-8 scrollbar-hide max-w-full"
               style={{ WebkitOverflowScrolling: 'touch', scrollBehavior: 'smooth' }}
             >
-              <div className="flex gap-6 px-4 py-4 w-max">
+              <div className="flex gap-6 px-4 py-4" style={{ width: 'fit-content', maxWidth: '100vw' }}>
 
                 {/* Testimonio 1 - Sergio Lucy */}
                 <motion.div
@@ -1015,7 +900,7 @@ export default function Inicio() {
               transition={{ duration: 0.5, delay: 0.8 }}
               className="text-sm text-gray-600 mt-4 font-medium"
             >
-              Quedan <span className="font-bold text-red-600">7 cupos</span> para este mes.
+              Quedan <span className="font-bold text-red-600">5 cupos</span> para este mes.
             </motion.p>
           </motion.div>
         </div>
@@ -1025,7 +910,7 @@ export default function Inicio() {
       <section id="como-funciona" data-section-name="Cómo Funciona" className="py-20 relative overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="/foto1.jpg"
+            src="/images/foto1.jpg"
             alt=""
             className="w-full h-full object-cover opacity-5"
           />
@@ -1248,7 +1133,7 @@ export default function Inicio() {
                 transition={{ duration: 0.5, delay: 1.7 }}
                 className="text-sm text-gray-600 mt-4 font-medium"
               >
-                🔥 Solo quedan 4 cupos para este mes
+                🔥 Solo quedan 5 cupos para este mes
               </motion.p>
             </motion.div>
           </motion.div>
@@ -1493,7 +1378,7 @@ export default function Inicio() {
                 transition={{ duration: 0.5, delay: 1.0 }}
                 className="text-sm text-white/80 mt-4 font-medium"
               >
-                🔥 Solo quedan 4 cupos para este mes
+                🔥 Solo quedan 5 cupos para este mes
               </motion.p>
             </motion.div>
           </motion.div>
@@ -1750,14 +1635,14 @@ export default function Inicio() {
                 transition={{ duration: 0.5, delay: 0.8 }}
                 className="text-white/80 text-sm text-center mt-3"
               >
-                ⚡ Últimos cupos del mes
+                ⚡ Solo 5 cupos disponibles este mes
               </motion.p>
             </motion.div>
           </div>
 
           {/* Carrusel móvil */}
-          <div className="md:hidden mt-12 pt-6">
-            <div className="flex overflow-x-auto gap-4 px-4 pb-4 snap-x snap-mandatory scrollbar-hide overflow-y-visible">
+          <div className="md:hidden mt-12 pt-6 max-w-full overflow-hidden">
+            <div className="flex overflow-x-auto gap-4 px-4 pb-4 snap-x snap-mandatory scrollbar-hide overflow-y-visible max-w-full">
 
               {/* Card Mobile 1 - Contador Independiente */}
               <motion.div
@@ -1887,7 +1772,7 @@ export default function Inicio() {
                   </motion.button>
                 </Link>
                 <p className="text-white/80 text-xs text-center mt-2">
-                  ⚡ Últimos cupos del mes
+                  ⚡ Solo 5 cupos disponibles este mes
                 </p>
               </motion.div>
             </div>
@@ -2017,7 +1902,7 @@ export default function Inicio() {
                     transition={{ duration: 0.5, delay: 0.6 }}
                     className="text-sm text-gray-600 font-medium"
                   >
-                    Solo quedan <span className="font-bold text-red-600">5 cupos</span> esta semana
+                    Solo quedan <span className="font-bold text-red-600">5 cupos</span> este mes
                   </motion.p>
                   <p className="text-xs text-gray-500 mt-1">Sin costo, sin compromiso</p>
                 </div>
@@ -2045,7 +1930,7 @@ export default function Inicio() {
               transition={{ duration: 0.5, type: "spring" }}
               className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-full text-sm font-black mb-8 shadow-lg"
             >
-              🚨 ATENCIÓN: Solo quedan 3 cupos para este mes
+              🚨 ATENCIÓN: Solo quedan 5 cupos para este mes
             </motion.div>
 
             {/* Headline final potente */}
@@ -2106,39 +1991,27 @@ export default function Inicio() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12"
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
             >
-              <Link to="/cotizador">
-                <motion.button
-                  whileHover={{ y: -4, scale: 1.05 }}
-                  whileActive={{ y: 0, scale: 0.98 }}
-                  className="inline-flex items-center gap-3 px-10 py-6 rounded-2xl bg-white text-primary-600 font-black text-lg transition-all duration-300 hover:shadow-[8px_8px_0_#000] relative group"
-                  style={{ boxShadow: '6px 6px 0 #000' }}
+              <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }} className="w-full sm:w-auto">
+                <Link
+                  to="/cotizador"
+                  className="block w-full sm:w-auto bg-white text-primary-600 hover:shadow-[6px_6px_0_#000000] transition-all focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 font-black shadow-[4px_4px_0_#000000] py-4 px-8 text-base md:text-lg rounded-lg text-center"
                   data-gtm="final_cta_primary"
                 >
-                  <span className="text-2xl">🚀</span>
-                  Empezar ahora - Cotiza GRATIS
-                  <motion.span
-                    animate={{ x: [0, 5, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                    className="text-xl"
-                  >
-                    →
-                  </motion.span>
-                </motion.button>
-              </Link>
-
-              <Link to="/contacto">
-                <motion.button
-                  whileHover={{ y: -2, scale: 1.02 }}
-                  whileActive={{ y: 0, scale: 0.98 }}
-                  className="inline-flex items-center gap-2 px-10 py-6 rounded-xl border-2 border-white text-white font-bold text-lg hover:bg-white hover:text-primary-600 transition-all duration-300"
+                  Cotizar mi plan
+                </Link>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }} className="w-full sm:w-auto">
+                <Link
+                  to="/contacto"
+                  className="block w-full sm:w-auto bg-transparent text-white border-2 border-white hover:bg-white hover:text-primary-600 transition-all focus:ring-2 focus:ring-white focus:ring-offset-2 font-bold flex items-center gap-2 justify-center py-4 px-8 text-base md:text-lg rounded-lg"
                   data-gtm="final_cta_secondary"
                 >
-                  <CalendarDays size={20} />
-                  Hablar con asesor
-                </motion.button>
-              </Link>
+                  <MessageCircle size={18} />
+                  Hablar con un asesor
+                </Link>
+              </motion.div>
             </motion.div>
 
             {/* Garantía y urgencia final */}
@@ -2154,7 +2027,7 @@ export default function Inicio() {
                 <span className="font-semibold">Garantía de 60 días o te devolvemos el dinero</span>
               </div>
               <p className="text-white/70 text-sm">
-                ⏰ <strong className="text-primary-200">Solo 8 cupos disponibles</strong> este mes
+                ⏰ <strong className="text-primary-200">Solo 5 cupos disponibles</strong> este mes
               </p>
               <p className="text-white/60 text-xs">
                 Sin compromisos a largo plazo • Cancela cuando quieras • Soporte 24/7

@@ -172,7 +172,7 @@ export default function SobreNosotros() {
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl transform rotate-6 scale-105 opacity-20" />
                   <img 
-                    src="/luciano.png"
+                    src="/images/luciano.png"
                     alt="Luciano Duarte"
                     className="rounded-2xl shadow-xl relative z-10"
                   />
@@ -221,7 +221,7 @@ export default function SobreNosotros() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl transform rotate-2 scale-105 opacity-20" />
                 <img
-                  src="/contadores.jpg"
+                  src="/images/contadores.jpg"
                   alt="Equipo Contadoor"
                   className="w-full rounded-2xl shadow-xl relative z-10"
                 />

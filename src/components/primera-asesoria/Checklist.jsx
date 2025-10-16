@@ -4,6 +4,7 @@ import { Check, ClipboardCheck, Target, AlertCircle, Sparkles } from 'lucide-rea
 import confetti from 'canvas-confetti';
 import { getLocal, setLocal } from '../../lib/storage';
 import { analytics } from '../../lib/analytics';
+import { trackButtonClick, trackEngagement } from '../../lib/gtm';
 
 const checklistItems = [
   {
@@ -47,21 +48,40 @@ const Checklist = () => {
       ...checkedItems,
       [itemId]: !checkedItems[itemId]
     };
-    
+
     setCheckedItems(newCheckedItems);
     setLocal('checklistItems', newCheckedItems);
-    
+
     const completedCount = Object.values(newCheckedItems).filter(Boolean).length;
-    
+    const itemText = checklistItems.find(item => item.id === itemId)?.text;
+
+    // Track individual item check/uncheck
+    trackButtonClick(
+      newCheckedItems[itemId] ? 'checklist_item_check' : 'checklist_item_uncheck',
+      'preparation_checklist',
+      {
+        item_id: itemId,
+        item_text: itemText,
+        total_completed: completedCount,
+        completion_percentage: Math.round((completedCount / checklistItems.length) * 100)
+      }
+    );
+
     if (completedCount === checklistItems.length && !hasCompletedBefore) {
       setHasCompletedBefore(true);
       analytics.checklistComplete(checklistItems.length);
-      
+
+      // Track checklist completion
+      trackEngagement('checklist_complete', {
+        total_items: checklistItems.length,
+        page: 'primera_asesoria'
+      });
+
       confetti({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#9D9D9C', '#7A7A7A', '#BDBDBD', '#ffffff']
+        colors: ['#A0569A', '#7A4075', '#C084BA', '#ffffff']
       });
     }
   };
@@ -100,7 +120,7 @@ const Checklist = () => {
           ))}
         </div>
 
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -148,7 +168,7 @@ const Checklist = () => {
                     animate={{ rotate: [0, 360] }}
                     transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
                   >
-                    <Target className="w-6 h-6" style={{ color: '#9D9D9C' }} />
+                    <Target className="w-6 h-6 text-white" />
                   </motion.div>
                   <span className="text-white font-medium text-lg">
                     {completedCount} de {checklistItems.length} completados
@@ -163,10 +183,10 @@ const Checklist = () => {
                 </motion.span>
               </div>
               <div className="w-full h-3 bg-white/20 rounded-full overflow-hidden">
-                <motion.div 
+                <motion.div
                   className="h-full rounded-full relative overflow-hidden"
                   style={{
-                    background: 'linear-gradient(90deg, #9D9D9C 0%, #7A7A7A 100%)'
+                    background: 'linear-gradient(90deg, #A0569A 0%, #7A4075 100%)'
                   }}
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
@@ -185,7 +205,7 @@ const Checklist = () => {
             </div>
 
             {/* Checklist Items Grid */}
-            <div className="grid md:grid-cols-2 gap-4 mb-8">
+            <div className="grid md:grid-cols-2 gap-4 mb-8 items-stretch">
               {checklistItems.map((item, idx) => (
                 <motion.label
                   key={item.id}
@@ -194,7 +214,7 @@ const Checklist = () => {
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
                   whileHover={{ scale: 1.02 }}
-                  className="relative cursor-pointer"
+                  className="relative cursor-pointer h-full"
                 >
                   <input
                     type="checkbox"
@@ -202,23 +222,23 @@ const Checklist = () => {
                     onChange={() => handleCheck(item.id)}
                     className="sr-only"
                   />
-                  <div className={`p-4 md:p-6 rounded-2xl border-2 transition-all duration-300 ${
-                    checkedItems[item.id] 
-                      ? 'bg-white/20 border-[#9D9D9C] shadow-lg' 
+                  <div className={`p-4 md:p-6 rounded-2xl border-2 transition-all duration-300 h-full min-h-[140px] flex flex-col ${
+                    checkedItems[item.id]
+                      ? 'bg-white/20 border-primary shadow-lg'
                       : 'bg-white/10 border-white/30 hover:bg-white/15 hover:border-white/50'
                   }`}>
-                    <div className="flex items-start gap-4">
+                    <div className="flex items-start gap-4 h-full">
                       {/* Icon */}
-                      <motion.div 
+                      <motion.div
                         className="text-2xl md:text-3xl flex-shrink-0"
                         animate={checkedItems[item.id] ? { rotate: [0, 10, -10, 0] } : {}}
                         transition={{ duration: 0.5 }}
                       >
                         {item.icon}
                       </motion.div>
-                      
+
                       {/* Content */}
-                      <div className="flex-1">
+                      <div className="flex-1 flex flex-col h-full">
                         <div className="flex items-start justify-between mb-2">
                           <h3 className={`font-semibold text-white transition-all ${
                             checkedItems[item.id] ? 'line-through opacity-70' : ''
@@ -226,10 +246,10 @@ const Checklist = () => {
                             Paso {item.id}
                           </h3>
                           <div className="relative flex items-center justify-center w-7 h-7">
-                            <div 
+                            <div
                               className={`w-7 h-7 rounded-lg border-2 transition-all ${
-                                checkedItems[item.id] 
-                                  ? 'bg-[#9D9D9C] border-[#9D9D9C]' 
+                                checkedItems[item.id]
+                                  ? 'bg-primary border-primary'
                                   : 'bg-white/10 border-white/40'
                               }`}
                             />
@@ -248,12 +268,12 @@ const Checklist = () => {
                             </AnimatePresence>
                           </div>
                         </div>
-                        <p className={`text-white/90 text-xs md:text-sm mb-2 transition-all pr-2 ${
+                        <p className={`text-white/90 text-xs md:text-sm mb-2 transition-all pr-2 flex-1 ${
                           checkedItems[item.id] ? 'line-through opacity-60' : ''
                         }`}>
                           {item.text}
                         </p>
-                        <p className="text-white/60 text-xs italic">
+                        <p className="text-white/60 text-xs italic mt-auto">
                           💡 {item.tip}
                         </p>
                       </div>
@@ -280,7 +300,7 @@ const Checklist = () => {
                     transition={{ duration: 0.5 }}
                     className="inline-block mb-4"
                   >
-                    <Sparkles className="w-12 h-12" style={{ color: '#9D9D9C' }} />
+                    <Sparkles className="w-12 h-12 text-primary" />
                   </motion.div>
                   <h3 className="text-xl md:text-2xl font-bold text-white mb-2">
                     ¡Excelente! Estás 100% preparado

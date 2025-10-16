@@ -1,19 +1,33 @@
 export async function sendLead(data) {
-  // Simulación de envío a API/CRM
-  console.log('Enviando lead:', data);
-  
-  // En producción, esto sería:
-  // const response = await fetch('/api/leads', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(data)
-  // });
-  // return response.json();
-  
-  // Simulamos una respuesta exitosa
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({ success: true, id: Date.now() });
-    }, 1000);
-  });
+  console.log('Enviando cotización lead:', data);
+
+  try {
+    // Use environment variable or fallback to production URL
+    const baseUrl = import.meta.env.VITE_API_URL || 'https://contadoor.cl/api';
+    const apiUrl = `${baseUrl}/cotizaciones-submit.php`;
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || 'Error desconocido');
+    }
+
+    return result;
+
+  } catch (error) {
+    console.error('Error enviando cotización lead:', error);
+    throw error;
+  }
 }

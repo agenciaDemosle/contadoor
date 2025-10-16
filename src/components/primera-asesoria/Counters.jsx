@@ -71,7 +71,7 @@ const Counter = ({ value, suffix, duration = 4 }) => {
 const Counters = () => {
   return (
     <section className="py-16 bg-gradient-to-r from-primary to-primary/80 relative z-20">
-      <div className="container mx-auto px-4">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

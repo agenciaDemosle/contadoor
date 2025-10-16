@@ -7,21 +7,23 @@ const Hero = () => {
       <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-32 md:w-64 h-32 md:h-64 bg-primary/10 rounded-full blur-2xl" />
 
-      {/* Logo en la esquina superior */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="absolute top-6 left-6 z-10"
-      >
-        <img
-          src={logoColor}
-          alt="Contadoor Logo"
-          className="h-8 md:h-10 w-auto object-contain"
-        />
-      </motion.div>
+      {/* Logo alineado con el contenido */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="pt-6 pb-4"
+        >
+          <img
+            src={logoColor}
+            alt="Contadoor Logo"
+            className="h-8 md:h-10 w-auto object-contain"
+          />
+        </motion.div>
+      </div>
 
-      <div className="container mx-auto px-4 relative">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -56,8 +58,8 @@ const Hero = () => {
                     className="relative inline-block"
                   >
                     <div className="w-32 h-32 md:w-48 md:h-48 mx-auto rounded-full p-1 bg-gradient-to-br from-primary to-primary/70 shadow-xl">
-                      <img 
-                        src="https://contadoor.cl/wp/wp-content/uploads/2025/09/luciano.png" 
+                      <img
+                        src="/images/luciano.png"
                         alt="Luciano - CEO Contadoor"
                         className="w-full h-full rounded-full object-cover bg-white"
                       />

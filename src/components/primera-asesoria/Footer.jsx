@@ -5,7 +5,7 @@ import logoColor from '../../assets/logo color.png';
 const Footer = () => {
   return (
     <footer className="text-white py-12 bg-primary-700">
-      <div className="container mx-auto px-4">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8 mb-8">
             <div>

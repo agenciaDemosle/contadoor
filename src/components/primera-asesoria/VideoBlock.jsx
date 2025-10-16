@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Play, Volume2, VolumeX } from 'lucide-react';
 import { useState, useRef } from 'react';
+import { trackEngagement, trackButtonClick } from '../../lib/gtm';
 
 const VideoBlock = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -13,6 +14,18 @@ const VideoBlock = () => {
       videoRef.current.play();
       setIsMuted(false);
       videoRef.current.muted = false;
+
+      // Track video play
+      trackEngagement('video_play', {
+        video_name: 'luciano_bienvenida',
+        section: 'video_block',
+        page: 'primera_asesoria'
+      });
+
+      trackButtonClick('video_play', 'video_block', {
+        video_duration: '3:00',
+        video_type: 'bienvenida'
+      });
     }
   };
 
@@ -20,6 +33,13 @@ const VideoBlock = () => {
     if (videoRef.current) {
       videoRef.current.muted = !videoRef.current.muted;
       setIsMuted(!isMuted);
+
+      // Track mute/unmute
+      trackButtonClick(
+        videoRef.current.muted ? 'video_mute' : 'video_unmute',
+        'video_block',
+        { video_name: 'luciano_bienvenida' }
+      );
     }
   };
 
@@ -35,7 +55,7 @@ const VideoBlock = () => {
           className="w-full shadow-xl"
           style={{ backgroundColor: '#A967A3' }}
         >
-          <div className="container mx-auto px-4 py-8 md:py-12">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 md:py-12">
               <div className="grid md:grid-cols-2 gap-6 md:gap-10 items-center">
                 {/* Text Content - Left side on desktop, top on mobile */}
                 <div className="text-center md:text-left order-2 md:order-1">
@@ -111,7 +131,7 @@ const VideoBlock = () => {
                         <video
                           ref={videoRef}
                           className="absolute inset-0 w-full h-full object-contain"
-                          src="https://contadoor.cl/wp/wp-content/uploads/2025/09/luciano.mov"
+                          src="/videos/video_Contador.mov"
                           muted={isMuted}
                           loop
                           playsInline

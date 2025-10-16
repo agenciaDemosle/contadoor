@@ -1,0 +1,923 @@
+{
+  "exportFormatVersion": 2,
+  "exportTime": "2025-10-14 20:45:00",
+  "containerVersion": {
+    "path": "accounts/6312574366/containers/229731136/versions/0",
+    "accountId": "6312574366",
+    "containerId": "229731136",
+    "containerVersionId": "0",
+    "name": "Meta Pixel Events - Contadoor",
+    "description": "Meta Pixel events para Contadoor principal - 10 eventos (5 estándar + 5 custom)",
+    "container": {
+      "path": "accounts/6312574366/containers/229731136",
+      "accountId": "6312574366",
+      "containerId": "229731136",
+      "name": "contadoor.cl",
+      "publicId": "GTM-PHGF2PCM",
+      "usageContext": ["WEB"]
+    },
+    "tag": [
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "tagId": "100",
+        "name": "Meta Pixel - Lead (Quote Complete)",
+        "type": "html",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "html",
+            "value": "<script>\n  if (typeof fbq !== 'undefined') {\n    fbq('track', 'Lead', {\n      content_name: 'Quote Completed',\n      content_category: {{DL - Service Type}},\n      value: 640,\n      currency: 'USD',\n      predicted_ltv: 1200\n    });\n  }\n</script>"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "supportDocumentWrite",
+            "value": "false"
+          }
+        ],
+        "fingerprint": "1729000000001",
+        "firingTriggerId": ["1001"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": {
+          "type": "MAP"
+        },
+        "consentSettings": {
+          "consentStatus": "NOT_SET"
+        }
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "tagId": "101",
+        "name": "Meta Pixel - Contact (Form Submit)",
+        "type": "html",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "html",
+            "value": "<script>\n  if (typeof fbq !== 'undefined') {\n    fbq('track', 'Contact', {\n      content_name: 'Contact Form',\n      content_category: {{DL - Form Type}},\n      value: 400,\n      currency: 'USD'\n    });\n  }\n</script>"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "supportDocumentWrite",
+            "value": "false"
+          }
+        ],
+        "fingerprint": "1729000000002",
+        "firingTriggerId": ["1002"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": {
+          "type": "MAP"
+        },
+        "consentSettings": {
+          "consentStatus": "NOT_SET"
+        }
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "tagId": "102",
+        "name": "Meta Pixel - Schedule (Meeting)",
+        "type": "html",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "html",
+            "value": "<script>\n  if (typeof fbq !== 'undefined') {\n    fbq('track', 'Schedule', {\n      content_name: 'Meeting Scheduled',\n      value: 800,\n      currency: 'USD'\n    });\n  }\n</script>"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "supportDocumentWrite",
+            "value": "false"
+          }
+        ],
+        "fingerprint": "1729000000003",
+        "firingTriggerId": ["1003"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": {
+          "type": "MAP"
+        },
+        "consentSettings": {
+          "consentStatus": "NOT_SET"
+        }
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "tagId": "103",
+        "name": "Meta Pixel - InitiateCheckout (Plan Click)",
+        "type": "html",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "html",
+            "value": "<script>\n  if (typeof fbq !== 'undefined') {\n    fbq('track', 'InitiateCheckout', {\n      content_name: 'Plan Selected',\n      content_ids: [{{DL - Plan ID}}],\n      content_type: 'product',\n      value: 480,\n      currency: 'USD'\n    });\n  }\n</script>"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "supportDocumentWrite",
+            "value": "false"
+          }
+        ],
+        "fingerprint": "1729000000004",
+        "firingTriggerId": ["1004"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": {
+          "type": "MAP"
+        },
+        "consentSettings": {
+          "consentStatus": "NOT_SET"
+        }
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "tagId": "104",
+        "name": "Meta Pixel - ViewContent (Home)",
+        "type": "html",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "html",
+            "value": "<script>\n  if (typeof fbq !== 'undefined') {\n    fbq('track', 'ViewContent', {\n      content_name: 'Home Page',\n      content_type: 'page'\n    });\n  }\n</script>"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "supportDocumentWrite",
+            "value": "false"
+          }
+        ],
+        "fingerprint": "1729000000005",
+        "firingTriggerId": ["1005"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": {
+          "type": "MAP"
+        },
+        "consentSettings": {
+          "consentStatus": "NOT_SET"
+        }
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "tagId": "105",
+        "name": "Meta Pixel - QuoteStart (Custom)",
+        "type": "html",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "html",
+            "value": "<script>\n  if (typeof fbq !== 'undefined') {\n    fbq('trackCustom', 'QuoteStart', {\n      content_name: 'Quote Started',\n      flow_type: {{DL - Flow Type}}\n    });\n  }\n</script>"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "supportDocumentWrite",
+            "value": "false"
+          }
+        ],
+        "fingerprint": "1729000000006",
+        "firingTriggerId": ["1006"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": {
+          "type": "MAP"
+        },
+        "consentSettings": {
+          "consentStatus": "NOT_SET"
+        }
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "tagId": "106",
+        "name": "Meta Pixel - VideoUnlocked (Custom)",
+        "type": "html",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "html",
+            "value": "<script>\n  if (typeof fbq !== 'undefined') {\n    fbq('trackCustom', 'VideoUnlocked', {\n      content_name: 'Video Unlocked',\n      progress: {{DL - Progress}},\n      threshold: 0.6,\n      value: 200,\n      currency: 'USD'\n    });\n  }\n</script>"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "supportDocumentWrite",
+            "value": "false"
+          }
+        ],
+        "fingerprint": "1729000000007",
+        "firingTriggerId": ["1007"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": {
+          "type": "MAP"
+        },
+        "consentSettings": {
+          "consentStatus": "NOT_SET"
+        }
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "tagId": "107",
+        "name": "Meta Pixel - QuoteAdvanced (Custom)",
+        "type": "html",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "html",
+            "value": "<script>\n  if (typeof fbq !== 'undefined') {\n    fbq('trackCustom', 'QuoteAdvanced', {\n      content_name: 'Quote Advanced',\n      quote_step: {{DL - Quote Step}},\n      service_type: {{DL - Service Type}}\n    });\n  }\n</script>"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "supportDocumentWrite",
+            "value": "false"
+          }
+        ],
+        "fingerprint": "1729000000008",
+        "firingTriggerId": ["1008"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": {
+          "type": "MAP"
+        },
+        "consentSettings": {
+          "consentStatus": "NOT_SET"
+        }
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "tagId": "108",
+        "name": "Meta Pixel - MasterConversion (Custom)",
+        "type": "html",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "html",
+            "value": "<script>\n  if (typeof fbq !== 'undefined') {\n    var conversionValue = {{DL - Conversion Value}} || 0;\n    fbq('trackCustom', 'MasterConversion', {\n      content_name: 'Master Conversion',\n      conversion_type: {{DL - Conversion Type}},\n      conversion_value: conversionValue,\n      value: Math.round(conversionValue / 250),\n      currency: 'USD'\n    });\n  }\n</script>"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "supportDocumentWrite",
+            "value": "false"
+          }
+        ],
+        "fingerprint": "1729000000009",
+        "firingTriggerId": ["1009"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": {
+          "type": "MAP"
+        },
+        "consentSettings": {
+          "consentStatus": "NOT_SET"
+        }
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "tagId": "109",
+        "name": "Meta Pixel - WhatsAppClick (Custom)",
+        "type": "html",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "html",
+            "value": "<script>\n  if (typeof fbq !== 'undefined') {\n    fbq('trackCustom', 'WhatsAppClick', {\n      content_name: 'WhatsApp Contact',\n      cta_location: {{DL - CTA Location}}\n    });\n  }\n</script>"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "supportDocumentWrite",
+            "value": "false"
+          }
+        ],
+        "fingerprint": "1729000000010",
+        "firingTriggerId": ["1010"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": {
+          "type": "MAP"
+        },
+        "consentSettings": {
+          "consentStatus": "NOT_SET"
+        }
+      }
+    ],
+    "trigger": [
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "triggerId": "1001",
+        "name": "CE - quote_calculator (complete)",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{_event}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "quote_calculator"
+              }
+            ]
+          }
+        ],
+        "filter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{DL - Quote Action}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "complete"
+              }
+            ]
+          }
+        ],
+        "fingerprint": "1729000000101"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "triggerId": "1002",
+        "name": "CE - form_submit (contact)",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{_event}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "form_submit"
+              }
+            ]
+          }
+        ],
+        "filter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{DL - Form Type}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "contact"
+              }
+            ]
+          }
+        ],
+        "fingerprint": "1729000000102"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "triggerId": "1003",
+        "name": "CE - meet_schedule_click",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{_event}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "meet_schedule_click"
+              }
+            ]
+          }
+        ],
+        "fingerprint": "1729000000103"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "triggerId": "1004",
+        "name": "CE - plan_click",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{_event}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "plan_click"
+              }
+            ]
+          }
+        ],
+        "fingerprint": "1729000000104"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "triggerId": "1005",
+        "name": "PV - Home Page",
+        "type": "HISTORY_CHANGE",
+        "filter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{Page Path}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "/"
+              }
+            ]
+          }
+        ],
+        "fingerprint": "1729000000105"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "triggerId": "1006",
+        "name": "CE - quote_calculator (start)",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{_event}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "quote_calculator"
+              }
+            ]
+          }
+        ],
+        "filter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{DL - Quote Action}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "start"
+              }
+            ]
+          }
+        ],
+        "fingerprint": "1729000000106"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "triggerId": "1007",
+        "name": "CE - meet_video_unlocked",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{_event}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "meet_video_unlocked"
+              }
+            ]
+          }
+        ],
+        "fingerprint": "1729000000107"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "triggerId": "1008",
+        "name": "CE - quote_calculator (step >= 3)",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{_event}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "quote_calculator"
+              }
+            ]
+          }
+        ],
+        "filter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{DL - Quote Action}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "step_complete"
+              }
+            ]
+          },
+          {
+            "type": "MATCH_REGEX",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{DL - Quote Step}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "^([3-9]|[1-9]\\d+)$"
+              }
+            ]
+          }
+        ],
+        "fingerprint": "1729000000108"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "triggerId": "1009",
+        "name": "CE - conversion",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{_event}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "conversion"
+              }
+            ]
+          }
+        ],
+        "fingerprint": "1729000000109"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "triggerId": "1010",
+        "name": "Click - WhatsApp",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{_event}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "whatsapp_click"
+              }
+            ]
+          }
+        ],
+        "fingerprint": "1729000000110"
+      }
+    ],
+    "variable": [
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "variableId": "2001",
+        "name": "DL - Service Type",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "setDefaultValue",
+            "value": "false"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "service_type"
+          }
+        ],
+        "fingerprint": "1729000000201"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "variableId": "2002",
+        "name": "DL - Form Type",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "setDefaultValue",
+            "value": "false"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "form_type"
+          }
+        ],
+        "fingerprint": "1729000000202"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "variableId": "2003",
+        "name": "DL - Plan ID",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "setDefaultValue",
+            "value": "false"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "plan_id"
+          }
+        ],
+        "fingerprint": "1729000000203"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "variableId": "2004",
+        "name": "DL - Flow Type",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "setDefaultValue",
+            "value": "false"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "flow_type"
+          }
+        ],
+        "fingerprint": "1729000000204"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "variableId": "2005",
+        "name": "DL - Progress",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "setDefaultValue",
+            "value": "false"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "progress"
+          }
+        ],
+        "fingerprint": "1729000000205"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "variableId": "2006",
+        "name": "DL - Quote Step",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "setDefaultValue",
+            "value": "false"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "quote_step"
+          }
+        ],
+        "fingerprint": "1729000000206"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "variableId": "2007",
+        "name": "DL - Quote Action",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "setDefaultValue",
+            "value": "false"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "quote_action"
+          }
+        ],
+        "fingerprint": "1729000000207"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "variableId": "2008",
+        "name": "DL - Conversion Type",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "setDefaultValue",
+            "value": "false"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "conversion_type"
+          }
+        ],
+        "fingerprint": "1729000000208"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "variableId": "2009",
+        "name": "DL - Conversion Value",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "setDefaultValue",
+            "value": "false"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "conversion_value"
+          }
+        ],
+        "fingerprint": "1729000000209"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "variableId": "2010",
+        "name": "DL - CTA Location",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "setDefaultValue",
+            "value": "false"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "cta_location"
+          }
+        ],
+        "fingerprint": "1729000000210"
+      }
+    ],
+    "builtInVariable": [
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "type": "PAGE_URL",
+        "name": "Page URL"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "type": "PAGE_HOSTNAME",
+        "name": "Page Hostname"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "type": "PAGE_PATH",
+        "name": "Page Path"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "type": "CLICK_URL",
+        "name": "Click URL"
+      },
+      {
+        "accountId": "6312574366",
+        "containerId": "229731136",
+        "type": "EVENT",
+        "name": "Event"
+      }
+    ],
+    "fingerprint": "1729000000000",
+    "tagManagerUrl": "https://tagmanager.google.com/#/versions/accounts/6312574366/containers/229731136/versions/0?apiLink=version"
+  }
+}

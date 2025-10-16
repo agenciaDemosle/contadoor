@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { HelpCircle, ChevronDown, Sparkles } from 'lucide-react';
 import { useState } from 'react';
+import { trackButtonClick, trackEngagement } from '../../lib/gtm';
 
 const faqs = [
   {
@@ -8,7 +9,7 @@ const faqs = [
     answer: 'Asesoría contable y tributaria especializada para pymes. Somos tu partner estratégico para optimizar tu gestión financiera y hacer crecer tu negocio con transparencia y resultados medibles.'
   },
   {
-    question: '¿Qué voy a conseguir en esta llamada?',
+    question: '¿Qué voy a conseguir en esta reunión virtual?',
     answer: 'Claridad sobre tu situación actual y conocer si podemos ayudarte. Analizaremos tus principales desafíos contables y tributarios, y te mostraremos cómo nuestro modelo puede resolverlos.'
   },
   {
@@ -16,20 +17,42 @@ const faqs = [
     answer: 'Nuestro contador líder, Luciano, quien tiene más de 10 años de experiencia ayudando a empresas como la tuya a optimizar su gestión contable y tributaria.'
   },
   {
-    question: '¿Tiene algún costo esta llamada?',
+    question: '¿Tiene algún costo esta reunión?',
     answer: 'No, es completamente gratuita. Esta reunión es nuestra inversión para conocerte y mostrarte cómo podemos agregar valor a tu empresa.'
   },
   {
-    question: '¿Qué pasa después de la llamada?',
+    question: '¿Qué pasa después de la reunión?',
     answer: 'Si tus objetivos se alinean con nuestra forma de trabajar, avanzamos con un plan de acción personalizado. Si no somos el partner adecuado, te lo diremos con transparencia y, de ser posible, te recomendaremos otras opciones.'
   }
 ];
 
 const FAQs = () => {
-  const [openIndex, setOpenIndex] = useState(null);
+  const [openIndex, setOpenIndex] = useState(0);
 
   const toggleFAQ = (index) => {
-    setOpenIndex(openIndex === index ? null : index);
+    const wasOpen = openIndex === index;
+    const newIndex = wasOpen ? null : index;
+    setOpenIndex(newIndex);
+
+    // Track FAQ interaction
+    trackButtonClick(
+      wasOpen ? 'faq_close' : 'faq_open',
+      'faqs_section',
+      {
+        faq_question: faqs[index].question,
+        faq_index: index,
+        action: wasOpen ? 'close' : 'open'
+      }
+    );
+
+    // Track engagement if opening
+    if (!wasOpen) {
+      trackEngagement('faq_interaction', {
+        question: faqs[index].question,
+        question_index: index,
+        page: 'primera_asesoria'
+      });
+    }
   };
 
   return (
@@ -58,7 +81,7 @@ const FAQs = () => {
         ))}
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -106,39 +129,39 @@ const FAQs = () => {
                   scale: 1.02,
                   transition: { duration: 0.5 }
                 }}
-                className="bg-primary rounded-xl shadow-lg overflow-hidden group"
+                className="bg-white rounded-xl shadow-lg overflow-hidden group border-2 border-primary transition-all duration-300"
                 style={{
-                  boxShadow: openIndex === index 
-                    ? "0 20px 40px rgba(160, 86, 153, 0.3)" 
+                  boxShadow: openIndex === index
+                    ? "0 20px 40px rgba(160, 86, 153, 0.3)"
                     : "0 4px 6px rgba(0, 0, 0, 0.1)"
                 }}
               >
                 <button
                   onClick={() => toggleFAQ(index)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-white/10 transition-all duration-300"
+                  className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-primary/5 transition-all duration-300"
                 >
                   <div className="flex items-center gap-3">
                     <motion.div
-                      animate={{ 
+                      animate={{
                         rotate: openIndex === index ? [0, 360] : 0,
                         scale: openIndex === index ? [1, 1.2, 1] : 1
                       }}
                       transition={{ duration: 1 }}
-                      className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-white/30 transition-colors"
+                      className="w-10 h-10 bg-primary/20 group-hover:bg-primary/30 rounded-full flex items-center justify-center flex-shrink-0 transition-colors"
                     >
-                      <HelpCircle className="w-5 h-5 text-white" />
+                      <HelpCircle className="w-5 h-5 text-primary" />
                     </motion.div>
-                    <div className="font-medium text-white text-base md:text-lg">{faq.question}</div>
+                    <div className="font-medium text-primary text-base md:text-lg">{faq.question}</div>
                   </div>
                   <motion.div
-                    animate={{ 
+                    animate={{
                       rotate: openIndex === index ? 180 : 0,
                       scale: openIndex === index ? 1.2 : 1
                     }}
                     transition={{ duration: 0.6, type: "spring", stiffness: 100 }}
-                    className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 transition-colors"
+                    className="w-8 h-8 bg-primary/20 group-hover:bg-primary/30 rounded-full flex items-center justify-center transition-colors"
                   >
-                    <ChevronDown className="w-5 h-5 text-white" />
+                    <ChevronDown className="w-5 h-5 text-primary" />
                   </motion.div>
                 </button>
                 
@@ -158,7 +181,8 @@ const FAQs = () => {
                     initial={{ y: -10 }}
                     animate={{ y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="px-6 pb-5 pl-16 text-white/90 bg-white/5 backdrop-blur"
+                    className="px-6 pt-4 pb-5 pl-16 text-white/90"
+                    style={{ backgroundColor: '#A967A3' }}
                   >
                     {faq.answer}
                   </motion.div>
@@ -175,7 +199,7 @@ const FAQs = () => {
             className="text-center mt-8"
           >
             <p className="text-gray-600">
-              ¿Tienes más preguntas? Despejamos todas tus dudas en la llamada
+              ¿Tienes más preguntas? Despejamos todas tus dudas en la reunión virtual
             </p>
           </motion.div>
         </motion.div>

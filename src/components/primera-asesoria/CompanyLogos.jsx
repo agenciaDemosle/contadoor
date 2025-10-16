@@ -87,8 +87,8 @@ const CompanyLogos = () => {
   const thirdRow = companies.slice(26, 37);
 
   return (
-    <section className="py-16 bg-white relative z-10 shadow-lg overflow-hidden">
-      <div className="container mx-auto px-4">
+    <section className="py-16 bg-white relative z-10 shadow-lg overflow-hidden max-w-full">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -104,9 +104,9 @@ const CompanyLogos = () => {
         </motion.div>
 
         {/* Carousel Container */}
-        <div className="relative space-y-6 overflow-hidden">
+        <div className="relative space-y-6 overflow-hidden max-w-full w-full">
           {/* First Row - Moving Right */}
-          <div className="flex overflow-hidden">
+          <div className="flex overflow-hidden w-full max-w-full">
             <motion.div
               className="flex gap-3 md:gap-6"
               animate={{
@@ -119,6 +119,7 @@ const CompanyLogos = () => {
                   ease: "linear"
                 }
               }}
+              style={{ width: 'fit-content', maxWidth: 'none' }}
             >
               {/* Duplicate the array for seamless loop */}
               {[...firstRow, ...firstRow].map((company, index) => (
@@ -145,7 +146,7 @@ const CompanyLogos = () => {
           </div>
 
           {/* Second Row - Moving Left */}
-          <div className="flex overflow-hidden">
+          <div className="flex overflow-hidden w-full max-w-full">
             <motion.div
               className="flex gap-3 md:gap-6"
               animate={{
@@ -158,6 +159,7 @@ const CompanyLogos = () => {
                   ease: "linear"
                 }
               }}
+              style={{ width: 'fit-content', maxWidth: 'none' }}
             >
               {/* Duplicate the array for seamless loop */}
               {[...secondRow, ...secondRow].map((company, index) => (
@@ -184,7 +186,7 @@ const CompanyLogos = () => {
           </div>
 
           {/* Third Row - Moving Right */}
-          <div className="flex overflow-hidden">
+          <div className="flex overflow-hidden w-full max-w-full">
             <motion.div
               className="flex gap-3 md:gap-6"
               animate={{
@@ -197,6 +199,7 @@ const CompanyLogos = () => {
                   ease: "linear"
                 }
               }}
+              style={{ width: 'fit-content', maxWidth: 'none' }}
             >
               {/* Duplicate the array for seamless loop */}
               {[...thirdRow, ...thirdRow].map((company, index) => (

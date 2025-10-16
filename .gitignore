@@ -26,5 +26,7 @@ dist-ssr
 # Large files
 *.mov
 *.zip
+*.tar.gz
 dist.zip
 public/luciano.mov
+contadoor-deploy.tar.gz

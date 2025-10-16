@@ -72,60 +72,92 @@ export default function Header() {
 
         <AnimatePresence>
           {mobileMenuOpen && (
-            <motion.div
-              className="md:hidden absolute left-0 right-0 top-full bg-white/95 backdrop-blur-md shadow-2xl border-t border-gray-100"
-              initial={{ opacity: 0, y: -20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-            >
+            <>
+              {/* Overlay difuminado */}
               <motion.div
-                className="px-4 pt-4 pb-6 space-y-2"
+                className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.1, duration: 0.2 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                onClick={() => setMobileMenuOpen(false)}
+              />
+
+              {/* Sidebar desde la derecha */}
+              <motion.div
+                className="md:hidden fixed top-0 right-0 bottom-0 w-[280px] bg-white shadow-2xl z-50"
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
               >
-                {navigation.map((item, index) => (
-                  <motion.div
-                    key={item.name}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05, duration: 0.2 }}
-                  >
+                <div className="flex flex-col h-full">
+                  {/* Header del sidebar */}
+                  <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                    <img src="/logooficial.png" alt="Contadoor" className="h-8 w-auto object-contain" />
+                    <button
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                    >
+                      <svg className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Menu items */}
+                  <div className="flex-1 overflow-y-auto py-4 px-3">
+                    <div className="space-y-1">
+                      {navigation.map((item, index) => (
+                        <motion.div
+                          key={item.name}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05, duration: 0.2 }}
+                        >
+                          <Link
+                            to={item.href}
+                            className={`relative block px-4 py-3 text-base font-medium transition-all duration-300 outline-none rounded-lg group ${
+                              location.pathname === item.href
+                                ? 'text-primary'
+                                : 'text-gray-700 hover:text-primary hover:bg-primary/5'
+                            }`}
+                            onClick={() => {
+                              trackButtonClick(item.name, 'mobile_navigation');
+                              setMobileMenuOpen(false);
+                            }}
+                          >
+                            {item.name}
+                            {/* Línea indicadora animada */}
+                            <span
+                              className={`absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-primary rounded-r-full transition-all duration-300 ${
+                                location.pathname === item.href
+                                  ? 'opacity-100 scale-100'
+                                  : 'opacity-0 scale-0 group-hover:opacity-50 group-hover:scale-100'
+                              }`}
+                            />
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* CTA button en el footer del sidebar */}
+                  <div className="p-4 border-t border-gray-200">
                     <Link
-                      to={item.href}
-                      className={`relative block px-4 py-3 text-base font-medium transition-all duration-300 outline-none rounded-xl ${
-                        location.pathname === item.href
-                          ? 'text-white bg-primary shadow-lg transform scale-[0.98]'
-                          : 'text-gray-700 hover:text-primary hover:bg-primary/10'
-                      }`}
+                      to="/contacto"
+                      className="block bg-primary text-white px-4 py-3 rounded-lg text-base font-semibold transition-all duration-200 hover:bg-primary/90 hover:scale-[0.98] active:scale-95 text-center shadow-md"
                       onClick={() => {
-                        trackButtonClick(item.name, 'mobile_navigation');
+                        trackCTAClick('Contactar', 'mobile_cta', 'mobile_navigation', '/contacto');
                         setMobileMenuOpen(false);
                       }}
                     >
-                      {item.name}
+                      Contactar
                     </Link>
-                  </motion.div>
-                ))}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: navigation.length * 0.05 + 0.1, duration: 0.2 }}
-                >
-                  <Link
-                    to="/contacto"
-                    className="block border-2 border-primary text-primary px-4 py-3 rounded-xl text-base font-semibold transition-all duration-200 hover:bg-primary hover:text-white hover:scale-[0.98] active:scale-95 mt-4"
-                    onClick={() => {
-                      trackCTAClick('Contactar', 'mobile_cta', 'mobile_navigation', '/contacto');
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    Contactar
-                  </Link>
-                </motion.div>
+                  </div>
+                </div>
               </motion.div>
-            </motion.div>
+            </>
           )}
         </AnimatePresence>
       </nav>

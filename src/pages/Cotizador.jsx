@@ -18,7 +18,9 @@ import {
   FileText,
   Check,
   MessageCircle,
-  Video
+  Video,
+  Mail,
+  Phone
 } from 'lucide-react';
 
 // Types
@@ -70,7 +72,10 @@ const preciosCreacion = {
 
 // State management
 const initialState = {
-  currentStep: -1, // -1 for welcome screen
+  currentStep: -2, // -2 for contact form, -1 for welcome screen
+  nombre: '',
+  email: '',
+  telefono: '',
   hasCompany: null,
   companyType: null,
   size: null,
@@ -92,21 +97,22 @@ const quoteReducer = (state, action) => {
 };
 
 // Components
-const StepLayout = ({ children, step, total }) => (
-  <div className="max-w-3xl mx-auto px-4">
-    {step >= 0 && <Stepper currentStep={step} totalSteps={total} />}
-    <motion.div
-      key={step}
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      transition={{ duration: 0.3 }}
-      className="bg-white rounded-3xl p-8 shadow-lg border border-gray-200 mt-8"
-    >
-      {children}
-    </motion.div>
-  </div>
-);
+const StepLayout = ({ children, step, total }) => {
+  return (
+    <div className="max-w-3xl mx-auto px-4">
+      {step >= 0 && <Stepper currentStep={step} totalSteps={total} />}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.3 }}
+        className="bg-white rounded-3xl p-8 shadow-lg border border-gray-200 mt-8"
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+};
 
 const Stepper = ({ currentStep, totalSteps }) => {
   const steps = ['Tipo de empresa', 'Tamaño', 'Trabajadores', 'Nivel de apoyo', 'Tu cotización'];
@@ -144,7 +150,7 @@ const Stepper = ({ currentStep, totalSteps }) => {
           className="bg-[#8A3F83] h-1.5 rounded-full"
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
         />
       </div>
       <div className="text-center">
@@ -214,11 +220,10 @@ const CTAButton = ({ children, onClick, disabled, variant = 'primary' }) => {
 };
 
 export default function Cotizador() {
-  const [state, dispatch] = useReducer(quoteReducer, initialState, (initial) => {
-    // Load from localStorage
-    const saved = localStorage.getItem('cotizador_state_v1');
-    return saved ? { ...initial, ...JSON.parse(saved) } : initial;
-  });
+  console.log('🏗️ Cotizador component mounting... (animations restored)');
+
+  // Simplified initialization - load from localStorage in useEffect instead
+  const [state, dispatch] = useReducer(quoteReducer, initialState);
 
   // Video gate modal state
   const [showVideoGate, setShowVideoGate] = useState(false);
@@ -230,8 +235,26 @@ export default function Cotizador() {
     }
   };
 
+  // Load from localStorage AFTER initial mount
+  useEffect(() => {
+    console.log('🔄 Cotizador useEffect - loading from localStorage...');
+    try {
+      const saved = localStorage.getItem('cotizador_state_v1');
+      if (saved) {
+        const savedState = JSON.parse(saved);
+        console.log('✅ Found saved state:', savedState);
+        dispatch({ payload: savedState });
+      } else {
+        console.log('ℹ️ No saved state found, using initial state');
+      }
+    } catch (error) {
+      console.error('❌ Error loading from localStorage:', error);
+    }
+  }, []);
+
   // Track page load
   useEffect(() => {
+    console.log('📊 Tracking page view, currentStep:', state.currentStep);
     trackQuoteEvent('page_view', 'cotizador_load', {
       hasExistingData: !!localStorage.getItem('cotizador_state_v1'),
       currentStep: state.currentStep
@@ -303,7 +326,7 @@ export default function Cotizador() {
     dispatch({ payload: { currentStep: newStep } });
   };
 
-  const goToResult = () => {
+  const goToResult = async () => {
     const result = calculatePrice();
     dispatch({
       payload: {
@@ -322,6 +345,50 @@ export default function Cotizador() {
       employeesCount: state.employeesCount,
       isCreation: result.isCreation
     });
+
+    // Enviar lead a la API
+    try {
+      const baseUrl = import.meta.env.VITE_API_URL || 'https://contadoor.cl/api';
+      const payload = {
+        nombre: state.nombre,
+        email: state.email,
+        telefono: state.telefono,
+        flujo: result.isCreation ? 'formalizacion' : 'empresa-existente',
+        datos_cotizacion: {
+          tipoEmpresa: state.companyType,
+          tamano: state.size,
+          hasTrabajadores: state.hasEmployees,
+          cantidadTrabajadores: state.employeesCount,
+          plan: state.support
+        },
+        precio_estimado: {
+          mensual: result.clp,
+          mensualUF: result.uf,
+          formalizacion: result.isCreation ? result.clp : 0
+        }
+      };
+
+      console.log('Enviando cotización:', payload);
+
+      const response = await fetch(`${baseUrl}/cotizaciones-submit.php`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+      console.log('Respuesta del servidor:', data);
+
+      if (!response.ok) {
+        console.error('Error HTTP:', response.status, data);
+      } else {
+        console.log('Cotización enviada exitosamente. Lead ID:', data.lead_id);
+      }
+    } catch (error) {
+      console.error('Error al enviar cotización:', error);
+    }
   };
 
   const handleContactClick = (channel) => {
@@ -347,6 +414,607 @@ export default function Cotizador() {
     }
   };
 
+  console.log('🎨 Rendering Cotizador, currentStep:', state.currentStep);
+
+  // Render current step using switch/case pattern (like demosleApp)
+  const renderStep = () => {
+    console.log('📍 renderStep called for step:', state.currentStep);
+
+    switch (state.currentStep) {
+      case -2:
+        return (
+        <div className="max-w-3xl mx-auto px-4" key="step-contact">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="bg-white rounded-3xl p-8 shadow-lg border border-gray-200 mt-8"
+          >
+            <div className="max-w-2xl mx-auto">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold mb-4">Primero, cuéntanos sobre ti</h2>
+                <p className="text-gray-600">
+                  Para personalizar tu cotización y enviártela por correo
+                </p>
+              </div>
+
+              <div className="bg-white rounded-2xl shadow-sm p-8 space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      Nombre completo *
+                    </div>
+                  </label>
+                  <input
+                    type="text"
+                    value={state.nombre}
+                    onChange={(e) => dispatch({ payload: { nombre: e.target.value } })}
+                    placeholder="Tu nombre completo"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#8A3F83] focus:border-transparent outline-none transition-all"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4" />
+                      Email *
+                    </div>
+                  </label>
+                  <input
+                    type="email"
+                    value={state.email}
+                    onChange={(e) => dispatch({ payload: { email: e.target.value } })}
+                    placeholder="tu@email.com"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#8A3F83] focus:border-transparent outline-none transition-all"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-4 h-4" />
+                      Teléfono *
+                    </div>
+                  </label>
+                  <input
+                    type="tel"
+                    value={state.telefono}
+                    onChange={(e) => dispatch({ payload: { telefono: e.target.value } })}
+                    placeholder="+56 9 1234 5678"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#8A3F83] focus:border-transparent outline-none transition-all"
+                    required
+                  />
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                  <p className="text-sm text-blue-800 flex items-start gap-2">
+                    <Lightbulb className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    Tu información será usada solo para enviarte tu cotización personalizada y contactarte si es necesario.
+                  </p>
+                </div>
+
+                <div className="flex justify-end">
+                  <CTAButton
+                    onClick={() => {
+                      if (state.nombre && state.email && state.telefono) {
+                        nextStep();
+                        trackQuoteEvent('contact_info_submitted', 'contact_form', {
+                          nombre: state.nombre,
+                          email: state.email,
+                          telefono: state.telefono
+                        });
+                      }
+                    }}
+                    disabled={!state.nombre || !state.email || !state.telefono}
+                  >
+                    Continuar →
+                  </CTAButton>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+        );
+
+      case -1:
+        return (
+        <StepLayout step={-1} key="step-welcome">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold mb-4">¡Bienvenido a Contadoor!</h2>
+            <p className="text-gray-600 mb-8">
+              Comencemos con una pregunta simple para ofrecerte la mejor solución
+            </p>
+            <h3 className="text-xl font-semibold mb-6">¿Tienes empresa?</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <SelectCard
+                title="Sí, ya tengo mi empresa"
+                subtitle="Necesito servicios contables y tributarios para mi empresa existente"
+                icon={<Building className="w-8 h-8" />}
+                active={state.hasCompany === true}
+                onClick={() => {
+                  dispatch({ payload: { hasCompany: true } });
+                  trackQuoteEvent('step_complete', 'has_company', { hasCompany: true });
+                }}
+                data-gtm="quote_has_company_yes"
+              />
+              <SelectCard
+                title="No, necesito crearla"
+                subtitle="Quiero formalizar mi negocio y necesito ayuda con el proceso"
+                icon={<Star className="w-8 h-8" />}
+                active={state.hasCompany === false}
+                onClick={() => {
+                  dispatch({ payload: { hasCompany: false } });
+                  trackQuoteEvent('step_complete', 'has_company', { hasCompany: false });
+                }}
+                data-gtm="quote_has_company_no"
+              />
+            </div>
+
+            <Pill type="info">
+              <div className="flex items-center gap-2">
+                <Lightbulb className="w-5 h-5 text-yellow-500" />
+                No te preocupes, en ambos casos te acompañaremos en todo el proceso
+              </div>
+            </Pill>
+
+            <div className="flex justify-end mt-8">
+              <CTAButton
+                onClick={() => {
+                  nextStep();
+                  trackQuoteEvent('start', 'welcome', { hasCompany: state.hasCompany });
+                }}
+                disabled={state.hasCompany === null}
+                data-gtm="quote_start_continue"
+              >
+                Continuar →
+              </CTAButton>
+            </div>
+          </div>
+        </StepLayout>
+        );
+
+      case 0:
+        return (
+        <StepLayout step={0} total={5} key="step-0">
+          <div>
+            <h2 className="text-2xl font-bold mb-2">¿Qué tipo de empresa tienes?</h2>
+            <p className="text-gray-600 mb-6">Selecciona el tipo de empresa para personalizar tu cotización</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              {Object.entries(CompanyTypes).map(([key, label]) => (
+                <SelectCard
+                  key={key}
+                  title={label}
+                  subtitle={key === 'persona' ? 'Con o sin giro comercial' :
+                           key === 'eirl' ? 'Empresa Individual de Responsabilidad Limitada' :
+                           key === 'spa' ? 'Sociedad por Acciones' : 'Ltda. o S.A.'}
+                  icon={
+                    key === 'persona' ? <User className="w-8 h-8" /> :
+                    key === 'eirl' ? <Store className="w-8 h-8" /> :
+                    key === 'spa' ? <Building className="w-8 h-8" /> :
+                    <University className="w-8 h-8" />
+                  }
+                  active={state.companyType === key}
+                  onClick={() => {
+                    dispatch({ payload: { companyType: key } });
+                    trackQuoteEvent('step_complete', 'company_type', { companyType: key });
+                  }}
+                  data-gtm={`quote_company_type_${key}`}
+                />
+              ))}
+            </div>
+
+            <p className="text-sm text-blue-600 mb-8 text-center">
+              <a href="#" className="underline">¿No estoy seguro del tipo de empresa?</a>
+            </p>
+
+            <div className="flex justify-between">
+              <CTAButton onClick={prevStep} variant="ghost">
+                ← Volver
+              </CTAButton>
+              <CTAButton
+                onClick={nextStep}
+                disabled={!state.companyType}
+              >
+                Continuar →
+              </CTAButton>
+            </div>
+          </div>
+        </StepLayout>
+        );
+
+      case 1:
+        return (
+        <StepLayout step={1} total={5} key="step-1">
+          <div>
+            <h2 className="text-2xl font-bold mb-2">¿Qué tan grande es tu empresa?</h2>
+            <p className="text-gray-600 mb-6">Esto nos ayuda a calcular un precio justo para tu negocio</p>
+
+            <div className="space-y-4 mb-6">
+              <SelectCard
+                title="Emprendiendo"
+                subtitle="Ventas anuales hasta $30M"
+                icon={<Sprout className="w-8 h-8" />}
+                active={state.size === 'emprendiendo'}
+                onClick={() => {
+                  dispatch({ payload: { size: 'emprendiendo' } });
+                  trackQuoteEvent('step_complete', 'company_size', { size: 'emprendiendo' });
+                }}
+                data-gtm="quote_size_emprendiendo"
+              />
+              <SelectCard
+                title="En Crecimiento"
+                subtitle="$30M – $150M anuales"
+                icon={<TrendingUp className="w-8 h-8" />}
+                active={state.size === 'crecimiento'}
+                onClick={() => {
+                  dispatch({ payload: { size: 'crecimiento' } });
+                  trackQuoteEvent('step_complete', 'company_size', { size: 'crecimiento' });
+                }}
+                data-gtm="quote_size_crecimiento"
+              />
+              <SelectCard
+                title="Consolidada"
+                subtitle="Más de $150M anuales"
+                icon={<Rocket className="w-8 h-8" />}
+                active={state.size === 'consolidada'}
+                onClick={() => {
+                  dispatch({ payload: { size: 'consolidada' } });
+                  trackQuoteEvent('step_complete', 'company_size', { size: 'consolidada' });
+                }}
+                data-gtm="quote_size_consolidada"
+              />
+            </div>
+
+            <Pill type="info">
+              <div className="flex items-center gap-2">
+                <Lightbulb className="w-5 h-5 text-yellow-500" />
+                Esta información es solo para calcular un precio referencial. No te pediremos cifras exactas.
+              </div>
+            </Pill>
+
+            <div className="flex justify-between mt-8">
+              <CTAButton onClick={prevStep} variant="ghost">
+                ← Volver
+              </CTAButton>
+              <CTAButton
+                onClick={nextStep}
+                disabled={!state.size}
+              >
+                Continuar →
+              </CTAButton>
+            </div>
+          </div>
+        </StepLayout>
+        );
+
+      case 2:
+        return (
+        <StepLayout step={2} total={5} key="step-2">
+          <div>
+            <h2 className="text-2xl font-bold mb-2">¿Tienes trabajadores contratados?</h2>
+            <p className="text-gray-600 mb-6">Esto nos ayuda a incluir servicios de gestión laboral si los necesitas</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <SelectCard
+                title="Sí"
+                subtitle="Tengo trabajadores contratados"
+                icon={<Users className="w-8 h-8" />}
+                active={state.hasEmployees === true}
+                onClick={() => {
+                  dispatch({ payload: { hasEmployees: true } });
+                  trackQuoteEvent('step_complete', 'has_employees', { hasEmployees: true });
+                }}
+                data-gtm="quote_has_employees_yes"
+              />
+              <SelectCard
+                title="No"
+                subtitle="No tengo trabajadores"
+                icon={<UserCheck className="w-8 h-8" />}
+                active={state.hasEmployees === false}
+                onClick={() => {
+                  dispatch({ payload: { hasEmployees: false, employeesCount: 0 } });
+                  trackQuoteEvent('step_complete', 'has_employees', { hasEmployees: false });
+                }}
+                data-gtm="quote_has_employees_no"
+              />
+            </div>
+
+            {state.hasEmployees === true && (
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  ¿Cuántos trabajadores tienes? (Opcional)
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8A3F83] focus:border-transparent"
+                  placeholder="Número de trabajadores"
+                  value={state.employeesCount || ''}
+                  onChange={(e) => dispatch({ payload: { employeesCount: parseInt(e.target.value) || 0 } })}
+                />
+              </div>
+            )}
+
+            <Pill type="info">
+              <div className="flex items-center gap-2">
+                <Lightbulb className="w-5 h-5 text-yellow-500" />
+                Si tienes trabajadores, incluiremos gestión de contratos, liquidaciones de sueldo y cumplimiento laboral en tu plan.
+              </div>
+            </Pill>
+
+            <div className="flex justify-between mt-8">
+              <CTAButton onClick={prevStep} variant="ghost">
+                ← Volver
+              </CTAButton>
+              <CTAButton
+                onClick={nextStep}
+                disabled={state.hasEmployees === null}
+              >
+                Continuar →
+              </CTAButton>
+            </div>
+          </div>
+        </StepLayout>
+        );
+
+      case 3:
+        return (
+        <StepLayout step={3} total={5} key="step-3">
+          <div>
+            <h2 className="text-2xl font-bold mb-2">¿Qué tipo de apoyo necesitas?</h2>
+            <p className="text-gray-600 mb-6">Elige el plan que mejor se adapte a tus necesidades</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <SelectCard
+                  title="Plan Completo"
+                  subtitle="Asesoría integral"
+                  icon={<Star className="w-8 h-8" />}
+                  active={state.support === 'completo'}
+                  onClick={() => {
+                    dispatch({ payload: { support: 'completo' } });
+                    trackQuoteEvent('step_complete', 'support_level', { support: 'completo' });
+                  }}
+                  recommended
+                  data-gtm="quote_support_completo"
+                />
+                <div className="ml-6 space-y-2 mt-4">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Check className="w-5 h-5 text-green-500 mr-2" />
+                    Asesor dedicado
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Check className="w-5 h-5 text-green-500 mr-2" />
+                    Planificación tributaria
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Check className="w-5 h-5 text-green-500 mr-2" />
+                    Gestión de trabajadores
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Check className="w-5 h-5 text-green-500 mr-2" />
+                    Reportes mensuales detallados
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Check className="w-5 h-5 text-green-500 mr-2" />
+                    Respuesta prioritaria
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Check className="w-5 h-5 text-green-500 mr-2" />
+                    Reuniones de estrategia
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <SelectCard
+                  title="Plan Esencial"
+                  subtitle="Lo básico para cumplir"
+                  icon={
+                    <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11zm-3-7v2h-2v-2h2zm-4 0v2H9v-2h2z"/>
+                    </svg>
+                  }
+                  active={state.support === 'esencial'}
+                  onClick={() => {
+                    dispatch({ payload: { support: 'esencial' } });
+                    trackQuoteEvent('step_complete', 'support_level', { support: 'esencial' });
+                  }}
+                  data-gtm="quote_support_esencial"
+                />
+                <div className="ml-6 space-y-2 mt-4">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                    </svg>
+                    Declaraciones mensuales
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Check className="w-5 h-5 text-green-500 mr-2" />
+                    Libro de compras y ventas
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Check className="w-5 h-5 text-green-500 mr-2" />
+                    Balance anual
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Check className="w-5 h-5 text-green-500 mr-2" />
+                    Soporte por email
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <Pill type="warning">
+              <Star className="inline w-4 h-4 mr-1" /> Tip: El 85% de nuestros clientes eligen el Plan Completo por la tranquilidad y el ahorro en multas que genera la planificación tributaria.
+            </Pill>
+
+            <div className="flex justify-between mt-8">
+              <CTAButton onClick={prevStep} variant="ghost">
+                ← Volver
+              </CTAButton>
+              <CTAButton
+                onClick={goToResult}
+                disabled={!state.support}
+              >
+                Ver mi cotización →
+              </CTAButton>
+            </div>
+          </div>
+        </StepLayout>
+        );
+
+      case 4:
+        return (
+        <StepLayout step={4} total={5} key="step-4">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6">
+            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 text-center flex items-center justify-center gap-2">
+              ¡Tu cotización está lista!
+              <CheckCircle className="w-8 h-8 text-green-500" />
+            </h2>
+            <p className="text-gray-600 text-center mt-1">
+              Basado en la información proporcionada, este es tu plan personalizado
+            </p>
+
+            {/* Price Card */}
+            <div className="mt-6 rounded-3xl p-6 md:p-8 bg-gradient-to-b from-[#F4E9F3] to-[#F8EEF6] border border-[#EED8EA]">
+              <div className="text-sm text-gray-600 text-center">
+                {state.isCreation ? 'Costo de formalización' : 'Plan mensual'}
+              </div>
+              <div className="text-4xl md:text-5xl font-extrabold text-gray-900 text-center mt-2">
+                {formatCLP(state.resultCLP)}
+              </div>
+              {state.resultUF && (
+                <div className="text-gray-600 text-center mt-1">({state.resultUF.toFixed(2)} UF)</div>
+              )}
+              <div className="text-gray-500 text-center">
+                {state.isCreation ? '+ IVA (costo único)' : '+ IVA mensual'}
+              </div>
+            </div>
+
+            {/* Benefits */}
+            <div className="mt-6 rounded-3xl bg-white border border-gray-200 p-6 md:p-7">
+              <h3 className="text-lg font-bold text-gray-900">
+                {state.isCreation ? 'El proceso incluye:' : 'Tu plan incluye:'}
+              </h3>
+              <div className="grid gap-3 mt-3">
+                {(state.isCreation ? (
+                  state.support === 'completo' ? [
+                    'Constitución de sociedad completa',
+                    'Inscripción en SII y obtención de RUT',
+                    'Apertura de cuenta corriente',
+                    'Timbres y documentación legal',
+                    'Primera asesoría contable incluida',
+                    'Seguimiento post-constitución'
+                  ] : [
+                    'Constitución de sociedad',
+                    'Inscripción en SII y RUT',
+                    'Documentación básica',
+                    'Asesoría inicial'
+                  ]
+                ) : (
+                  state.support === 'completo' ? [
+                    'Asesor dedicado',
+                    'Planificación tributaria',
+                    'Reportes mensuales detallados',
+                    'Gestión completa de trabajadores',
+                    'Respuesta prioritaria'
+                  ] : [
+                    'Declaraciones mensuales',
+                    'Libro de compras y ventas',
+                    'Balance anual',
+                    'Soporte por email'
+                  ]
+                )).map((benefit, index) => (
+                  <div key={index} className="flex items-start gap-3 text-gray-700">
+                    <Check className="w-5 h-5 text-green-500 mt-0.5" />
+                    <span>{benefit}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* CTAs */}
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="rounded-3xl border border-[#E8D9E7] bg-gradient-to-b from-[#F7EEF6] to-[#F3E5F2] p-6 md:p-7 hover:shadow-[0_16px_50px_rgba(17,24,39,0.12)] transition">
+                <MessageCircle className="w-11 h-11 text-[#8A3F83]" />
+                <div className="text-xl font-extrabold text-gray-900 mt-2">Hablar por WhatsApp</div>
+                <div className="text-gray-600">Conversación directa e inmediata con un asesor</div>
+                <button
+                  onClick={() => {
+                    handleContactClick('whatsapp');
+                    trackCTAClick('Hablar ahora', 'quote_result', 'cotizador', 'whatsapp');
+                    trackQuoteEvent('complete', 'final_result', {
+                      resultUF: state.resultUF,
+                      resultCLP: state.resultCLP,
+                      channel: 'whatsapp'
+                    });
+                  }}
+                  data-channel="whatsapp"
+                  data-gtm="quote_cta_whatsapp"
+                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#8A3F83] text-white font-semibold px-5 py-3 shadow-[0_8px_0_#111] hover:translate-y-[-1px] hover:shadow-[0_7px_0_#111] active:translate-y-0 active:shadow-none transition focus:outline-none focus:ring-2 focus:ring-black/20"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  Hablar ahora
+                </button>
+                <div className="text-sm text-gray-500 mt-2">Respuesta inmediata</div>
+              </div>
+
+              <div className="rounded-3xl border border-gray-200 bg-gradient-to-b from-white to-[#EFF3F6] p-6 md:p-7 hover:shadow-[0_16px_50px_rgba(17,24,39,0.12)] transition">
+                <Video className="w-11 h-11 text-gray-800" />
+                <div className="text-xl font-extrabold text-gray-900 mt-2">Agendar reunión virtual</div>
+                <div className="text-gray-600">Videollamada de 30 minutos con un asesor experto</div>
+                <button
+                  onClick={() => {
+                    handleContactClick('meeting');
+                    trackCTAClick('Agendar reunión', 'quote_result', 'cotizador', 'meeting');
+                    trackQuoteEvent('complete', 'final_result', {
+                      resultUF: state.resultUF,
+                      resultCLP: state.resultCLP,
+                      channel: 'meeting'
+                    });
+                  }}
+                  data-channel="meeting"
+                  data-gtm="quote_cta_meeting"
+                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white text-[#8A3F83] font-semibold px-5 py-3 shadow-[0_8px_0_#111] hover:translate-y-[-1px] hover:shadow-[0_7px_0_#111] active:translate-y-0 active:shadow-none transition focus:outline-none focus:ring-2 focus:ring-[#8A3F83]/20"
+                >
+                  <Video className="w-4 h-4" />
+                  Agendar reunión
+                </button>
+                <div className="text-sm text-gray-500 mt-2">Elige tu horario preferido</div>
+              </div>
+            </div>
+
+            {/* Separator + Navigation */}
+            <div className="mt-8 mb-3 h-px bg-gray-200"></div>
+            <button
+              onClick={prevStep}
+              className="block text-center text-gray-600 hover:text-gray-900 mx-auto"
+            >
+              ← Volver al paso anterior
+            </button>
+
+            {/* Success Pill */}
+            <div className="mt-4 rounded-2xl bg-[#EBF8EE] text-[#147D3F] border border-[#BAE7C4] px-5 py-4 text-center flex items-center justify-center gap-2">
+              <Check className="w-5 h-5" />
+              Tu cotización ha sido calculada y está lista para discutir
+            </div>
+          </div>
+        </StepLayout>
+        );
+
+      default:
+        console.warn('⚠️ Unknown step:', state.currentStep);
+        return null;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F7F9FB] py-8 lg:py-12">
       {/* Hero */}
@@ -362,486 +1030,14 @@ export default function Cotizador() {
         </p>
       </div>
 
-      <AnimatePresence mode="wait">
-        {/* Welcome Screen */}
-        {state.currentStep === -1 && (
-          <StepLayout step={-1}>
-            <div className="text-center">
-              <h2 className="text-3xl font-bold mb-4">¡Bienvenido a Contadoor!</h2>
-              <p className="text-gray-600 mb-8">
-                Comencemos con una pregunta simple para ofrecerte la mejor solución
-              </p>
-              <h3 className="text-xl font-semibold mb-6">¿Tienes empresa?</h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <SelectCard
-                  title="Sí, ya tengo mi empresa"
-                  subtitle="Necesito servicios contables y tributarios para mi empresa existente"
-                  icon={<Building className="w-8 h-8" />}
-                  active={state.hasCompany === true}
-                  onClick={() => {
-                    dispatch({ payload: { hasCompany: true } });
-                    trackQuoteEvent('step_complete', 'has_company', { hasCompany: true });
-                  }}
-                  data-gtm="quote_has_company_yes"
-                />
-                <SelectCard
-                  title="No, necesito crearla"
-                  subtitle="Quiero formalizar mi negocio y necesito ayuda con el proceso"
-                  icon={<Star className="w-8 h-8" />}
-                  active={state.hasCompany === false}
-                  onClick={() => {
-                    dispatch({ payload: { hasCompany: false } });
-                    trackQuoteEvent('step_complete', 'has_company', { hasCompany: false });
-                  }}
-                  data-gtm="quote_has_company_no"
-                />
-              </div>
-
-              <Pill type="info">
-                <div className="flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 text-yellow-500" />
-                  No te preocupes, en ambos casos te acompañaremos en todo el proceso
-                </div>
-              </Pill>
-
-              <div className="flex justify-end mt-8">
-                <CTAButton
-                  onClick={() => {
-                    nextStep();
-                    trackQuoteEvent('start', 'welcome', { hasCompany: state.hasCompany });
-                  }}
-                  disabled={state.hasCompany === null}
-                  data-gtm="quote_start_continue"
-                >
-                  Continuar →
-                </CTAButton>
-              </div>
-            </div>
-          </StepLayout>
-        )}
-
-        {/* Step 1: Company Type */}
-        {state.currentStep === 0 && (
-          <StepLayout step={0} total={5}>
-            <div>
-              <h2 className="text-2xl font-bold mb-2">¿Qué tipo de empresa tienes?</h2>
-              <p className="text-gray-600 mb-6">Selecciona el tipo de empresa para personalizar tu cotización</p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                {Object.entries(CompanyTypes).map(([key, label]) => (
-                  <SelectCard
-                    key={key}
-                    title={label}
-                    subtitle={key === 'persona' ? 'Con o sin giro comercial' :
-                             key === 'eirl' ? 'Empresa Individual de Responsabilidad Limitada' :
-                             key === 'spa' ? 'Sociedad por Acciones' : 'Ltda. o S.A.'}
-                    icon={
-                      key === 'persona' ? <User className="w-8 h-8" /> :
-                      key === 'eirl' ? <Store className="w-8 h-8" /> :
-                      key === 'spa' ? <Building className="w-8 h-8" /> :
-                      <University className="w-8 h-8" />
-                    }
-                    active={state.companyType === key}
-                    onClick={() => {
-                      dispatch({ payload: { companyType: key } });
-                      trackQuoteEvent('step_complete', 'company_type', { companyType: key });
-                    }}
-                    data-gtm={`quote_company_type_${key}`}
-                  />
-                ))}
-              </div>
-
-              <p className="text-sm text-blue-600 mb-8 text-center">
-                <a href="#" className="underline">¿No estoy seguro del tipo de empresa?</a>
-              </p>
-
-              <div className="flex justify-between">
-                <CTAButton onClick={prevStep} variant="ghost">
-                  ← Volver
-                </CTAButton>
-                <CTAButton
-                  onClick={nextStep}
-                  disabled={!state.companyType}
-                >
-                  Continuar →
-                </CTAButton>
-              </div>
-            </div>
-          </StepLayout>
-        )}
-
-        {/* Step 2: Company Size */}
-        {state.currentStep === 1 && (
-          <StepLayout step={1} total={5}>
-            <div>
-              <h2 className="text-2xl font-bold mb-2">¿Qué tan grande es tu empresa?</h2>
-              <p className="text-gray-600 mb-6">Esto nos ayuda a calcular un precio justo para tu negocio</p>
-
-              <div className="space-y-4 mb-6">
-                <SelectCard
-                  title="Emprendiendo"
-                  subtitle="Ventas anuales hasta $30M"
-                  icon={<Sprout className="w-8 h-8" />}
-                  active={state.size === 'emprendiendo'}
-                  onClick={() => {
-                    dispatch({ payload: { size: 'emprendiendo' } });
-                    trackQuoteEvent('step_complete', 'company_size', { size: 'emprendiendo' });
-                  }}
-                  data-gtm="quote_size_emprendiendo"
-                />
-                <SelectCard
-                  title="En Crecimiento"
-                  subtitle="$30M – $150M anuales"
-                  icon={<TrendingUp className="w-8 h-8" />}
-                  active={state.size === 'crecimiento'}
-                  onClick={() => {
-                    dispatch({ payload: { size: 'crecimiento' } });
-                    trackQuoteEvent('step_complete', 'company_size', { size: 'crecimiento' });
-                  }}
-                  data-gtm="quote_size_crecimiento"
-                />
-                <SelectCard
-                  title="Consolidada"
-                  subtitle="Más de $150M anuales"
-                  icon={<Rocket className="w-8 h-8" />}
-                  active={state.size === 'consolidada'}
-                  onClick={() => {
-                    dispatch({ payload: { size: 'consolidada' } });
-                    trackQuoteEvent('step_complete', 'company_size', { size: 'consolidada' });
-                  }}
-                  data-gtm="quote_size_consolidada"
-                />
-              </div>
-
-              <Pill type="info">
-                <div className="flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 text-yellow-500" />
-                  Esta información es solo para calcular un precio referencial. No te pediremos cifras exactas.
-                </div>
-              </Pill>
-
-              <div className="flex justify-between mt-8">
-                <CTAButton onClick={prevStep} variant="ghost">
-                  ← Volver
-                </CTAButton>
-                <CTAButton
-                  onClick={nextStep}
-                  disabled={!state.size}
-                >
-                  Continuar →
-                </CTAButton>
-              </div>
-            </div>
-          </StepLayout>
-        )}
-
-        {/* Step 3: Employees */}
-        {state.currentStep === 2 && (
-          <StepLayout step={2} total={5}>
-            <div>
-              <h2 className="text-2xl font-bold mb-2">¿Tienes trabajadores contratados?</h2>
-              <p className="text-gray-600 mb-6">Esto nos ayuda a incluir servicios de gestión laboral si los necesitas</p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <SelectCard
-                  title="Sí"
-                  subtitle="Tengo trabajadores contratados"
-                  icon={<Users className="w-8 h-8" />}
-                  active={state.hasEmployees === true}
-                  onClick={() => dispatch({ payload: { hasEmployees: true } })}
-                />
-                <SelectCard
-                  title="No"
-                  subtitle="No tengo trabajadores"
-                  icon={<UserCheck className="w-8 h-8" />}
-                  active={state.hasEmployees === false}
-                  onClick={() => dispatch({ payload: { hasEmployees: false, employeesCount: 0 } })}
-                />
-              </div>
-
-              {state.hasEmployees === true && (
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    ¿Cuántos trabajadores tienes? (Opcional)
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8A3F83] focus:border-transparent"
-                    placeholder="Número de trabajadores"
-                    value={state.employeesCount || ''}
-                    onChange={(e) => dispatch({ payload: { employeesCount: parseInt(e.target.value) || 0 } })}
-                  />
-                </div>
-              )}
-
-              <Pill type="info">
-                <div className="flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 text-yellow-500" />
-                  Si tienes trabajadores, incluiremos gestión de contratos, liquidaciones de sueldo y cumplimiento laboral en tu plan.
-                </div>
-              </Pill>
-
-              <div className="flex justify-between mt-8">
-                <CTAButton onClick={prevStep} variant="ghost">
-                  ← Volver
-                </CTAButton>
-                <CTAButton
-                  onClick={nextStep}
-                  disabled={state.hasEmployees === null}
-                >
-                  Continuar →
-                </CTAButton>
-              </div>
-            </div>
-          </StepLayout>
-        )}
-
-        {/* Step 4: Support Level */}
-        {state.currentStep === 3 && (
-          <StepLayout step={3} total={5}>
-            <div>
-              <h2 className="text-2xl font-bold mb-2">¿Qué tipo de apoyo necesitas?</h2>
-              <p className="text-gray-600 mb-6">Elige el plan que mejor se adapte a tus necesidades</p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <SelectCard
-                    title="Plan Completo"
-                    subtitle="Asesoría integral"
-                    icon={<Star className="w-8 h-8" />}
-                    active={state.support === 'completo'}
-                    onClick={() => dispatch({ payload: { support: 'completo' } })}
-                    recommended
-                  />
-                  <div className="ml-6 space-y-2 mt-4">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Check className="w-5 h-5 text-green-500 mr-2" />
-                      Asesor dedicado
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Check className="w-5 h-5 text-green-500 mr-2" />
-                      Planificación tributaria
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Check className="w-5 h-5 text-green-500 mr-2" />
-                      Gestión de trabajadores
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Check className="w-5 h-5 text-green-500 mr-2" />
-                      Reportes mensuales detallados
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Check className="w-5 h-5 text-green-500 mr-2" />
-                      Respuesta prioritaria
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Check className="w-5 h-5 text-green-500 mr-2" />
-                      Reuniones de estrategia
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <SelectCard
-                    title="Plan Esencial"
-                    subtitle="Lo básico para cumplir"
-                    icon={
-                      <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11zm-3-7v2h-2v-2h2zm-4 0v2H9v-2h2z"/>
-                      </svg>
-                    }
-                    active={state.support === 'esencial'}
-                    onClick={() => dispatch({ payload: { support: 'esencial' } })}
-                  />
-                  <div className="ml-6 space-y-2 mt-4">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
-                      </svg>
-                      Declaraciones mensuales
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Check className="w-5 h-5 text-green-500 mr-2" />
-                      Libro de compras y ventas
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Check className="w-5 h-5 text-green-500 mr-2" />
-                      Balance anual
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Check className="w-5 h-5 text-green-500 mr-2" />
-                      Soporte por email
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <Pill type="warning">
-                <Star className="inline w-4 h-4 mr-1" /> Tip: El 85% de nuestros clientes eligen el Plan Completo por la tranquilidad y el ahorro en multas que genera la planificación tributaria.
-              </Pill>
-
-              <div className="flex justify-between mt-8">
-                <CTAButton onClick={prevStep} variant="ghost">
-                  ← Volver
-                </CTAButton>
-                <CTAButton
-                  onClick={goToResult}
-                  disabled={!state.support}
-                >
-                  Ver mi cotización →
-                </CTAButton>
-              </div>
-            </div>
-          </StepLayout>
-        )}
-
-        {/* Step 5: Result */}
-        {state.currentStep === 4 && (
-          <StepLayout step={4} total={5}>
-            <div className="max-w-3xl mx-auto px-4 sm:px-6">
-              <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 text-center flex items-center justify-center gap-2">
-                ¡Tu cotización está lista!
-                <CheckCircle className="w-8 h-8 text-green-500" />
-              </h2>
-              <p className="text-gray-600 text-center mt-1">
-                Basado en la información proporcionada, este es tu plan personalizado
-              </p>
-
-              {/* Price Card */}
-              <div className="mt-6 rounded-3xl p-6 md:p-8 bg-gradient-to-b from-[#F4E9F3] to-[#F8EEF6] border border-[#EED8EA]">
-                <div className="text-sm text-gray-600 text-center">
-                  {state.isCreation ? 'Costo de formalización' : 'Plan mensual'}
-                </div>
-                <div className="text-4xl md:text-5xl font-extrabold text-gray-900 text-center mt-2">
-                  {formatCLP(state.resultCLP)}
-                </div>
-                {state.resultUF && (
-                  <div className="text-gray-600 text-center mt-1">({state.resultUF.toFixed(2)} UF)</div>
-                )}
-                <div className="text-gray-500 text-center">
-                  {state.isCreation ? '+ IVA (costo único)' : '+ IVA mensual'}
-                </div>
-              </div>
-
-              {/* Benefits */}
-              <div className="mt-6 rounded-3xl bg-white border border-gray-200 p-6 md:p-7">
-                <h3 className="text-lg font-bold text-gray-900">
-                  {state.isCreation ? 'El proceso incluye:' : 'Tu plan incluye:'}
-                </h3>
-                <div className="grid gap-3 mt-3">
-                  {(state.isCreation ? (
-                    state.support === 'completo' ? [
-                      'Constitución de sociedad completa',
-                      'Inscripción en SII y obtención de RUT',
-                      'Apertura de cuenta corriente',
-                      'Timbres y documentación legal',
-                      'Primera asesoría contable incluida',
-                      'Seguimiento post-constitución'
-                    ] : [
-                      'Constitución de sociedad',
-                      'Inscripción en SII y RUT',
-                      'Documentación básica',
-                      'Asesoría inicial'
-                    ]
-                  ) : (
-                    state.support === 'completo' ? [
-                      'Asesor dedicado',
-                      'Planificación tributaria',
-                      'Reportes mensuales detallados',
-                      'Gestión completa de trabajadores',
-                      'Respuesta prioritaria'
-                    ] : [
-                      'Declaraciones mensuales',
-                      'Libro de compras y ventas',
-                      'Balance anual',
-                      'Soporte por email'
-                    ]
-                  )).map((benefit, index) => (
-                    <div key={index} className="flex items-start gap-3 text-gray-700">
-                      <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                      <span>{benefit}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* CTAs */}
-              <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="rounded-3xl border border-[#E8D9E7] bg-gradient-to-b from-[#F7EEF6] to-[#F3E5F2] p-6 md:p-7 hover:shadow-[0_16px_50px_rgba(17,24,39,0.12)] transition">
-                  <MessageCircle className="w-11 h-11 text-[#8A3F83]" />
-                  <div className="text-xl font-extrabold text-gray-900 mt-2">Hablar por WhatsApp</div>
-                  <div className="text-gray-600">Conversación directa e inmediata con un asesor</div>
-                  <button
-                    onClick={() => {
-                      handleContactClick('whatsapp');
-                      trackCTAClick('Hablar ahora', 'quote_result', 'cotizador', 'whatsapp');
-                      trackQuoteEvent('complete', 'final_result', {
-                        resultUF: state.resultUF,
-                        resultCLP: state.resultCLP,
-                        channel: 'whatsapp'
-                      });
-                    }}
-                    data-channel="whatsapp"
-                    data-gtm="quote_cta_whatsapp"
-                    className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#8A3F83] text-white font-semibold px-5 py-3 shadow-[0_8px_0_#111] hover:translate-y-[-1px] hover:shadow-[0_7px_0_#111] active:translate-y-0 active:shadow-none transition focus:outline-none focus:ring-2 focus:ring-black/20"
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                    Hablar ahora
-                  </button>
-                  <div className="text-sm text-gray-500 mt-2">Respuesta inmediata</div>
-                </div>
-
-                <div className="rounded-3xl border border-gray-200 bg-gradient-to-b from-white to-[#EFF3F6] p-6 md:p-7 hover:shadow-[0_16px_50px_rgba(17,24,39,0.12)] transition">
-                  <Video className="w-11 h-11 text-gray-800" />
-                  <div className="text-xl font-extrabold text-gray-900 mt-2">Agendar reunión virtual</div>
-                  <div className="text-gray-600">Videollamada de 30 minutos con un asesor experto</div>
-                  <button
-                    onClick={() => {
-                      handleContactClick('meeting');
-                      trackCTAClick('Agendar reunión', 'quote_result', 'cotizador', 'meeting');
-                      trackQuoteEvent('complete', 'final_result', {
-                        resultUF: state.resultUF,
-                        resultCLP: state.resultCLP,
-                        channel: 'meeting'
-                      });
-                    }}
-                    data-channel="meeting"
-                    data-gtm="quote_cta_meeting"
-                    className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white text-[#8A3F83] font-semibold px-5 py-3 shadow-[0_8px_0_#111] hover:translate-y-[-1px] hover:shadow-[0_7px_0_#111] active:translate-y-0 active:shadow-none transition focus:outline-none focus:ring-2 focus:ring-[#8A3F83]/20"
-                  >
-                    <Video className="w-4 h-4" />
-                    Agendar reunión
-                  </button>
-                  <div className="text-sm text-gray-500 mt-2">Elige tu horario preferido</div>
-                </div>
-              </div>
-
-              {/* Separator + Navigation */}
-              <div className="mt-8 mb-3 h-px bg-gray-200"></div>
-              <button
-                onClick={prevStep}
-                className="block text-center text-gray-600 hover:text-gray-900 mx-auto"
-              >
-                ← Volver al paso anterior
-              </button>
-
-              {/* Success Pill */}
-              <div className="mt-4 rounded-2xl bg-[#EBF8EE] text-[#147D3F] border border-[#BAE7C4] px-5 py-4 text-center flex items-center justify-center gap-2">
-                <Check className="w-5 h-5" />
-                Tu cotización ha sido calculada y está lista para discutir
-              </div>
-            </div>
-          </StepLayout>
-        )}
-      </AnimatePresence>
+      {/* Render current step */}
+      {renderStep()}
 
       {/* Video Gate Modal */}
       <MeetingVideoGate
         open={showVideoGate}
         onClose={() => setShowVideoGate(false)}
-        src="/video_Contador.mov"
+        src="/videos/video_Contador.mov"
         poster=""
         schedulerUrl="https://outlook.office.com/book/Contadoor@contadoor.cl/s/328-yS0DYEm9h2tm4lDIHQ2?ismsaljsauthenabled=true"
         title="Conoce cómo transformamos tu contabilidad"

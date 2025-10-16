@@ -12,7 +12,7 @@ const Header = () => {
 
   return (
     <header className="bg-white sticky top-0 z-50 border-b border-primary-100 shadow-soft">
-      <div className="container mx-auto px-4 py-4">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
           <motion.div 
             initial={{ opacity: 0, x: -20 }}

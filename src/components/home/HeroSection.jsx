@@ -40,7 +40,7 @@ export default function HeroSection() {
               initial="hidden"
               animate="visible"
               transition={{ delay: 0.1 }}
-              className="inline-block mb-6"
+              className="hidden md:inline-block mb-6"
             >
               <a
                 href="#reseñas"
@@ -68,7 +68,7 @@ export default function HeroSection() {
               initial="hidden"
               animate="visible"
               transition={{ delay: 0.2 }}
-              className="inline-block mb-6 ml-4"
+              className="hidden md:inline-block mb-6 ml-4"
             >
               <div className="bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-semibold border border-green-200">
                 <span className="mr-2">🛡️</span>
@@ -86,7 +86,7 @@ export default function HeroSection() {
               role="banner"
             >
               <span className="text-5xl md:text-6xl font-extrabold text-white">
-                Ahorra tiempo y evita multas.
+                Ahorra tiempo y evita multas
               </span>
               <br />
               <span className="text-4xl md:text-5xl font-medium text-primary-200">
@@ -103,7 +103,7 @@ export default function HeroSection() {
               Contabilidad, impuestos y laboral en un solo lugar, con un asesor directo que te avisa antes de cada vencimiento.
             </motion.p>
 
-            <div className="mb-8 space-y-3">
+            <div className="mb-8 space-y-3 hidden md:block">
               {[
                 { icon: Bell, text: "Te avisamos antes de cada vencimiento", delay: 0.4 },
                 { icon: MessageCircle, text: "Habla directo con tu asesor por WhatsApp", delay: 0.5 },
@@ -136,21 +136,21 @@ export default function HeroSection() {
               transition={{ duration: 0.5, delay: 0.6 }}
               className="space-y-4"
             >
-              <div className="flex flex-wrap gap-4">
-                <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }} className="w-full sm:w-auto">
                   <Button
                     to="/cotizador"
-                    className="!bg-white !text-primary-600 hover:shadow-[6px_6px_0_#000000] transition-all focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 font-black shadow-[4px_4px_0_#000000]"
+                    className="!bg-white !text-primary-600 hover:shadow-[6px_6px_0_#000000] transition-all focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 font-black shadow-[4px_4px_0_#000000] w-full sm:w-auto"
                     data-gtm="hero_cta_primary"
                     aria-label="Cotizar mi plan de contabilidad"
                   >
                     Cotizar mi plan
                   </Button>
                 </motion.div>
-                <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
+                <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }} className="w-full sm:w-auto">
                   <Button
                     to="/contacto"
-                    className="!bg-transparent !text-white border-2 border-white hover:!bg-white hover:!text-primary-600 transition-all focus:ring-2 focus:ring-white focus:ring-offset-2 font-bold flex items-center gap-2"
+                    className="!bg-transparent !text-white border-2 border-white hover:!bg-white hover:!text-primary-600 transition-all focus:ring-2 focus:ring-white focus:ring-offset-2 font-bold flex items-center gap-2 justify-center w-full sm:w-auto"
                     data-gtm="hero_cta_secondary"
                     aria-label="Hablar con un asesor ahora"
                   >
@@ -198,7 +198,7 @@ export default function HeroSection() {
           >
             <div className="absolute inset-0 bg-white/60 rounded-2xl transform rotate-6 scale-105 h-[520px] w-[400px]" />
             <img
-              src="/hero.jpg"
+              src="/images/hero.jpg"
               alt="Equipo profesional de Contadoor trabajando"
               className="rounded-2xl shadow-xl shadow-primary-900/20 relative z-10 object-cover h-[520px] w-[400px] object-top"
               loading="eager"

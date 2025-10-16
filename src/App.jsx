@@ -1,9 +1,10 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Outlet, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import GTMTracker from './components/GTMTracker';
+import FloatingCTAButton from './components/FloatingCTAButton';
 import Inicio from './pages/Inicio';
 import Servicios from './pages/Servicios';
 import Cotizador from './pages/Cotizador';
@@ -16,17 +17,18 @@ import Blog from './pages/Blog';
 import Privacidad from './pages/Privacidad';
 import Terminos from './pages/Terminos';
 import PrimeraAsesoria from './pages/PrimeraAsesoria';
+import Admin from './pages/Admin';
 
 function PreviewWrapper({ children }) {
-  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isPreviewMode, setIsPreviewMode] = useState(() => {
+    // Initialize from URL params once
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('preview') === 'true';
+    }
+    return false;
+  });
   const [frameDevice, setFrameDevice] = useState('desktop');
-  const location = useLocation();
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const preview = urlParams.get('preview') === 'true';
-    setIsPreviewMode(preview);
-  }, [location]);
 
   if (!isPreviewMode) {
     return children;
@@ -50,7 +52,7 @@ function PreviewWrapper({ children }) {
 
         <div className="preview__actions">
           <div className="preview__responsive">
-            <button 
+            <button
               className={`preview__device-btn ${frameDevice === 'desktop' ? 'active' : ''}`}
               onClick={() => setFrameDevice('desktop')}
               title="Vista Desktop"
@@ -59,7 +61,7 @@ function PreviewWrapper({ children }) {
                 <path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v2H8v2h8v-2h-2v-2h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z"/>
               </svg>
             </button>
-            <button 
+            <button
               className={`preview__device-btn ${frameDevice === 'tablet' ? 'active' : ''}`}
               onClick={() => setFrameDevice('tablet')}
               title="Vista Tablet"
@@ -68,7 +70,7 @@ function PreviewWrapper({ children }) {
                 <path d="M18 0H6C4.34 0 3 1.34 3 3v18c0 1.66 1.34 3 3 3h12c1.66 0 3-1.34 3-3V3c0-1.66-1.34-3-3-3zm-6 22c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm7-4H5V4h14v14z"/>
               </svg>
             </button>
-            <button 
+            <button
               className={`preview__device-btn ${frameDevice === 'mobile' ? 'active' : ''}`}
               onClick={() => setFrameDevice('mobile')}
               title="Vista Móvil"
@@ -93,33 +95,52 @@ function PreviewWrapper({ children }) {
   );
 }
 
+// Layout component for pages with Header/Footer
+function MainLayout() {
+  const location = useLocation();
+  console.log('🏠 MainLayout rendering, location:', location.pathname);
+
+  return (
+    <PreviewWrapper>
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow">
+          {console.log('📦 About to render Outlet for:', location.pathname)}
+          <Outlet />
+          {console.log('✅ Outlet rendered for:', location.pathname)}
+        </main>
+        <Footer />
+        <FloatingCTAButton />
+      </div>
+    </PreviewWrapper>
+  );
+}
+
 function App() {
   return (
     <Router>
       <ScrollToTop />
       <GTMTracker />
-      <PreviewWrapper>
-        <div className="min-h-screen flex flex-col">
-          <Header />
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Inicio />} />
-              <Route path="/servicios" element={<Servicios />} />
-              <Route path="/cotizador" element={<Cotizador />} />
-              <Route path="/contacto" element={<Contacto />} />
-              <Route path="/como-funciona" element={<ComoFunciona />} />
-              <Route path="/por-que-contadoor" element={<PorQueContadoor />} />
-              <Route path="/sobre-nosotros" element={<SobreNosotros />} />
-              <Route path="/recursos" element={<Recursos />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/privacidad" element={<Privacidad />} />
-              <Route path="/terminos" element={<Terminos />} />
-              <Route path="/primera-asesoria" element={<PrimeraAsesoria />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
-      </PreviewWrapper>
+      <Routes>
+        {/* Rutas independientes sin layout */}
+        <Route path="/primera-asesoria" element={<PrimeraAsesoria />} />
+        <Route path="/admin" element={<Admin />} />
+
+        {/* Rutas con layout principal */}
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Inicio />} />
+          <Route path="/servicios" element={<Servicios />} />
+          <Route path="/cotizador" element={<Cotizador />} />
+          <Route path="/contacto" element={<Contacto />} />
+          <Route path="/como-funciona" element={<ComoFunciona />} />
+          <Route path="/por-que-contadoor" element={<PorQueContadoor />} />
+          <Route path="/sobre-nosotros" element={<SobreNosotros />} />
+          <Route path="/recursos" element={<Recursos />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/privacidad" element={<Privacidad />} />
+          <Route path="/terminos" element={<Terminos />} />
+        </Route>
+      </Routes>
     </Router>
   )
 }

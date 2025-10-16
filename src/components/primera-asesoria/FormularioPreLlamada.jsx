@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, CheckCircle, AlertCircle, User, Phone, Mail, ArrowRight, ArrowLeft } from 'lucide-react';
 import { analytics } from '../../lib/analytics';
+import { trackFormStart, trackFormSubmit, trackButtonClick, trackConversion } from '../../lib/gtm';
 
 const FormularioPreLlamada = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -77,10 +78,17 @@ const FormularioPreLlamada = () => {
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
   const handleInputChange = (name, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => {
+      const isFirstInput = !prev[name] && value;
+      if (isFirstInput && currentStep === 0) {
+        // Track form start on first input
+        trackFormStart('formulario_pre_llamada', 'lead_qualification');
+      }
+      return {
+        ...prev,
+        [name]: value
+      };
+    });
   };
 
   const isStepValid = () => {
@@ -97,7 +105,15 @@ const FormularioPreLlamada = () => {
 
   const handleNext = () => {
     if (isStepValid() && currentStep < totalSteps - 1) {
-      setCurrentStep(currentStep + 1);
+      const nextStep = currentStep + 1;
+      setCurrentStep(nextStep);
+
+      // Track form step progression
+      trackButtonClick('form_next_step', 'formulario_pre_llamada', {
+        step_from: currentStep + 1,
+        step_to: nextStep + 1,
+        form_progress: `${nextStep + 1}/${totalSteps}`
+      });
     }
   };
 
@@ -115,8 +131,8 @@ const FormularioPreLlamada = () => {
 
     try {
       // Use environment variable or fallback to production URL
-      const baseUrl = import.meta.env.VITE_API_URL || 'https://landing.contadoor.cl/api';
-      const apiUrl = `${baseUrl}/form-submit`;
+      const baseUrl = import.meta.env.VITE_API_URL || 'https://contadoor.cl/api';
+      const apiUrl = `${baseUrl}/form-submit.php`;
       
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -131,6 +147,20 @@ const FormularioPreLlamada = () => {
       if (response.ok) {
         setSubmitStatus('success');
         analytics.formSubmitted('prellamada', formData);
+
+        // Track successful form submission
+        trackFormSubmit('formulario_pre_llamada', 'lead_qualification', {
+          nombre: formData.nombre,
+          email: formData.email,
+          telefono: formData.telefono,
+          response_data: data
+        });
+
+        // Track conversion
+        trackConversion('pre_meeting_form', 1, {
+          lead_source: 'primera_asesoria_landing',
+          form_type: 'qualification'
+        });
         
         // Reset form after success
         setTimeout(() => {
@@ -264,7 +294,7 @@ const FormularioPreLlamada = () => {
   if (submitStatus === 'success') {
     return (
       <section className="py-16 bg-gradient-to-br from-primary/5 to-white">
-        <div className="container mx-auto px-4">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -295,7 +325,7 @@ const FormularioPreLlamada = () => {
 
   return (
     <section id="formulario" className="py-16 bg-gradient-to-br from-primary/5 to-white relative z-30">
-      <div className="container mx-auto px-4">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
